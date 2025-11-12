@@ -11,6 +11,7 @@ if TYPE_CHECKING:
 
 from types import MethodType
 
+
 def get_frame_title(
     data: xr.DataArray,
     frame: int,
@@ -19,7 +20,7 @@ def get_frame_title(
     t: str = "time",
 ) -> str:
     """Generate the title for a frame
-    
+
     Parameters
     ----------
     data
@@ -56,7 +57,7 @@ def calculate_window_boundaries(
 ) -> np.ndarray:
     """Calculate the bounderies a moving window frame. If the user specifies xlim, this will
     be used as the initial bounderies and the window will move along acordingly.
-    
+
     Parameters
     ----------
     data
@@ -99,7 +100,7 @@ def compute_global_limits(
 ) -> tuple[float, float]:
     """Remove all NaN values from the target data to calculate the global minimum and maximum of the data.
     User defined percentiles can remove extreme outliers.
-    
+
     Parameters
     ----------
     data
@@ -107,7 +108,7 @@ def compute_global_limits(
     min_percentile
         Minimum percentile of the data
     max_percentile
-        Maximum percentile of the data    
+        Maximum percentile of the data
     """
 
     # Removes NaN values, needed for moving windows
@@ -174,16 +175,22 @@ def animate(
     coord_names.remove(t)
 
     N_frames = data[t].size
-    global_min, global_max = compute_global_limits(data, min_percentile, max_percentile)
 
     if data.ndim == 2:
         kwargs.setdefault("x", coord_names[0])
-        plot = data.isel({t:0}).plot(ax=ax, **kwargs)
+        plot = data.isel({t: 0}).plot(ax=ax, **kwargs)
         ax.set_title(get_frame_title(data, 0, display_sdf_name, title, t))
+        global_min, global_max = compute_global_limits(
+            data, min_percentile, max_percentile
+        )
         ax.set_ylim(global_min, global_max)
 
     if data.ndim == 3:
-        kwargs.setdefault("norm", plt.Normalize(vmin = global_min, vmax = global_max))
+        if "norm" not in kwargs:
+            global_min, global_max = compute_global_limits(
+                data, min_percentile, max_percentile
+            )
+            kwargs["norm"] = plt.Normalize(vmin=global_min, vmax=global_max)
         kwargs["add_colorbar"] = False
         # Set default x and y coordinates for 3D data if not provided
         kwargs.setdefault("x", coord_names[0])
@@ -192,9 +199,9 @@ def animate(
         # Finds the time step with the minimum data value
         # This is needed so that the animation can use the correct colour bar
         argmin_time = np.unravel_index(data.argmin(), data.shape)[0]
-        
+
         # Initialize the plot, the final output will still start at the first time step
-        plot = data.isel({t:argmin_time}).plot(ax = ax, **kwargs)
+        plot = data.isel({t: argmin_time}).plot(ax=ax, **kwargs)
         ax.set_title(get_frame_title(data, 0, display_sdf_name, title, t))
         kwargs["cmap"] = plot.cmap
 
@@ -208,7 +215,9 @@ def animate(
     # check if there is a moving window by finding NaNs in the data
     move_window = np.isnan(np.sum(data.values))
     if move_window:
-        window_boundaries = calculate_window_boundaries(data, kwargs.get("xlim", False), kwargs["x"])
+        window_boundaries = calculate_window_boundaries(
+            data, kwargs.get("xlim", False), kwargs["x"]
+        )
 
     def update(frame):
         # Set the xlim for each frame in the case of a moving window
@@ -218,32 +227,34 @@ def animate(
         # Update plot for the new frame
         ax.clear()
 
-        plot = data.isel({t:frame}).plot(ax = ax, **kwargs)
+        plot = data.isel({t: frame}).plot(ax=ax, **kwargs)
         ax.set_title(get_frame_title(data, frame, display_sdf_name, title, t))
 
         if data.ndim == 2:
             ax.set_ylim(global_min, global_max)
         return plot
-    
+
     return FuncAnimation(
         ax.get_figure(),
         update,
-        frames = range(N_frames),
-        interval = 1000 / fps,
-        repeat = True,
+        frames=range(N_frames),
+        interval=1000 / fps,
+        repeat=True,
     )
+
 
 def show(anim):
     """Shows the FuncAnimation in a Jupyter notebook.
-    
+
     Parameters
     ----------
     anim
-        `matplotlib.animation.FuncAnimation`    
+        `matplotlib.animation.FuncAnimation`
     """
     from IPython.display import HTML  # noqa: PLC0415
 
     return HTML(anim.to_jshtml())
+
 
 @xr.register_dataarray_accessor("epoch")
 class EpochAccessor:
