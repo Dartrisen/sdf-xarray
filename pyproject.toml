@@ -49,8 +49,16 @@ docs = [
   "myst-parser",
   "jupyter-sphinx",
   "sphinx-copybutton",
+  "pooch>=1.8.2",
+  "tqdm",
 ]
-test = ["pytest >= 3.3.0", "dask[complete]", "matplotlib"]
+test = [
+  "pytest >= 3.3.0",
+  "dask[complete]",
+  "matplotlib",
+  "pooch>=1.8.2",
+  "tqdm",
+]
 lint = ["ruff"]
 build = ["cibuildwheel[uv]"]
 jupyter = ["dask[diagnostics]", "ipykernel>=6.29.5"]
