@@ -27,9 +27,8 @@ to femto-seconds or particle energy from Joules to electron-volts.
     })
 
 
-=====================
 Rescaling coordinates
-=====================
+---------------------
 
 For simple scaling and unit relabelling of coordinates (e.g., converting meters to microns),
 the most straightforward approach is to use the |rescale_coords_accessor| dataset accessor.
@@ -74,9 +73,8 @@ seconds (``s``) to femto-seconds (``fs``) by applying a multiplier of ``1e15``.
     ds = ds.epoch.rescale_coords(1e15, "fs", "time")
     ds["time"]
 
-================================
 Unit conversion with pint-xarray
-================================
+--------------------------------
 
 While this is sufficient for most use cases, we can enhance this functionality
 using the `pint <https://pint.readthedocs.io/en/stable/getting/index.html>`_ library.
