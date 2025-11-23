@@ -19,6 +19,7 @@ if Version(version("xarray")) >= Version("2025.8.0"):
 
 TEST_FILES_DIR_1D = download.fetch_dataset("test_files_1D")
 TEST_FILES_DIR_2D_MW = download.fetch_dataset("test_files_2D_moving_window")
+TEST_FILES_DIR_3D = download.fetch_dataset("test_files_3D")
 
 
 def test_animation_accessor():
@@ -71,7 +72,7 @@ def test_xr_get_frame_title_no_optional_params():
         preprocess=SDFPreprocess(),
     ) as ds:
         data = ds["Derived_Number_Density_electron"]
-        expected_result = "time = 5.47e-14 [s]"
+        expected_result = "Time = 5.47e-14 [s]"
         result = sxp.get_frame_title(data, 0)
         assert expected_result == result
 
@@ -84,7 +85,7 @@ def test_xr_get_frame_title_sdf_name():
         preprocess=SDFPreprocess(),
     ) as ds:
         data = ds["Derived_Number_Density_electron"]
-        expected_result = "time = 5.47e-14 [s], 0000.sdf"
+        expected_result = "Time = 5.47e-14 [s], 0000.sdf"
         result = sxp.get_frame_title(data, 0, display_sdf_name=True)
         assert expected_result == result
 
@@ -97,7 +98,7 @@ def test_xr_get_frame_title_custom_title():
         preprocess=SDFPreprocess(),
     ) as ds:
         data = ds["Derived_Number_Density_electron"]
-        expected_result = "Test Title, time = 5.47e-14 [s]"
+        expected_result = "Test Title, Time = 5.47e-14 [s]"
         result = sxp.get_frame_title(data, 0, title_custom="Test Title")
         assert expected_result == result
 
@@ -110,10 +111,18 @@ def test_xr_get_frame_title_custom_title_and_sdf_name():
         preprocess=SDFPreprocess(),
     ) as ds:
         data = ds["Derived_Number_Density_electron"]
-        expected_result = "Test Title, time = 5.47e-14 [s], 0000.sdf"
+        expected_result = "Test Title, Time = 5.47e-14 [s], 0000.sdf"
         result = sxp.get_frame_title(
             data, 0, display_sdf_name=True, title_custom="Test Title"
         )
+        assert expected_result == result
+
+
+def test_get_frame_title_Z_Grid_mid():
+    with xr.open_dataset(TEST_FILES_DIR_3D / "0001.sdf") as ds:
+        data = ds["Derived_Number_Density_Electron"]
+        expected_result = "Z = 3.91e-07 [m]"
+        result = sxp.get_frame_title(data, 0, t="Z_Grid_mid")
         assert expected_result == result
 
 
