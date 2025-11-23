@@ -135,6 +135,7 @@ datasets = [
     "tutorial_dataset_1d",
     "tutorial_dataset_2d",
     "tutorial_dataset_2d_moving_window",
+    "tutorial_dataset_3d",
 ]
 
 cwd = Path(__file__).parent.resolve()
