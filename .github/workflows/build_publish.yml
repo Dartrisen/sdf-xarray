@@ -29,7 +29,7 @@ jobs:
     - name: Set up Python 3.12 and install dependencies
       run: |
         uv python install 3.12
-        uv sync --python 3.12 --extra test --extra build --frozen
+        uv sync --python 3.12 --group test --group build --frozen
 
     - name: Build
       uses: pypa/cibuildwheel@v3.1.3

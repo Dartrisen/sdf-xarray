@@ -2393,10 +2393,6 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
-build = [
-    { name = "cibuildwheel", version = "2.23.3", source = { registry = "https://pypi.org/simple" }, extra = ["uv"], marker = "python_full_version < '3.11'" },
-    { name = "cibuildwheel", version = "3.2.1", source = { registry = "https://pypi.org/simple" }, extra = ["uv"], marker = "python_full_version >= '3.11'" },
-]
 docs = [
     { name = "jupyter-sphinx" },
     { name = "matplotlib" },
@@ -2422,14 +2418,20 @@ jupyter = [
     { name = "dask", extra = ["diagnostics"] },
     { name = "ipykernel" },
 ]
-lint = [
-    { name = "ruff" },
-]
 pint = [
     { name = "pint", version = "0.24.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "pint", version = "0.25", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "pint-xarray", version = "0.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "pint-xarray", version = "0.6.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+]
+
+[package.dev-dependencies]
+build = [
+    { name = "cibuildwheel", version = "2.23.3", source = { registry = "https://pypi.org/simple" }, extra = ["uv"], marker = "python_full_version < '3.11'" },
+    { name = "cibuildwheel", version = "3.2.1", source = { registry = "https://pypi.org/simple" }, extra = ["uv"], marker = "python_full_version >= '3.11'" },
+]
+lint = [
+    { name = "ruff" },
 ]
 test = [
     { name = "dask", extra = ["complete"] },
@@ -2441,14 +2443,11 @@ test = [
 
 [package.metadata]
 requires-dist = [
-    { name = "cibuildwheel", extras = ["uv"], marker = "extra == 'build'" },
     { name = "dask", specifier = ">=2024.7.1" },
-    { name = "dask", extras = ["complete"], marker = "extra == 'test'" },
     { name = "dask", extras = ["diagnostics"], marker = "extra == 'jupyter'" },
     { name = "ipykernel", marker = "extra == 'jupyter'", specifier = ">=6.29.5" },
     { name = "jupyter-sphinx", marker = "extra == 'docs'" },
     { name = "matplotlib", marker = "extra == 'docs'" },
-    { name = "matplotlib", marker = "extra == 'test'" },
     { name = "myst-parser", marker = "extra == 'docs'" },
     { name = "numpy", specifier = ">=2.0.0" },
     { name = "pickleshare", marker = "extra == 'docs'" },
@@ -2457,9 +2456,6 @@ requires-dist = [
     { name = "pint-xarray", marker = "extra == 'docs'" },
     { name = "pint-xarray", marker = "extra == 'pint'" },
     { name = "pooch", marker = "extra == 'docs'", specifier = ">=1.8.2" },
-    { name = "pooch", marker = "extra == 'test'", specifier = ">=1.8.2" },
-    { name = "pytest", marker = "extra == 'test'", specifier = ">=3.3.0" },
-    { name = "ruff", marker = "extra == 'lint'" },
     { name = "sphinx", marker = "extra == 'docs'", specifier = ">=5.3" },
     { name = "sphinx-argparse-cli", marker = "extra == 'docs'", specifier = ">=1.10.0" },
     { name = "sphinx-autodoc-typehints", marker = "extra == 'docs'", specifier = ">=1.19" },
@@ -2467,10 +2463,20 @@ requires-dist = [
     { name = "sphinx-copybutton", marker = "extra == 'docs'" },
     { name = "sphinx-inline-tabs", marker = "extra == 'docs'" },
     { name = "tqdm", marker = "extra == 'docs'" },
-    { name = "tqdm", marker = "extra == 'test'" },
     { name = "xarray", specifier = ">=2024.1.0" },
 ]
-provides-extras = ["docs", "test", "lint", "build", "jupyter", "pint"]
+provides-extras = ["docs", "jupyter", "pint"]
+
+[package.metadata.requires-dev]
+build = [{ name = "cibuildwheel", extras = ["uv"] }]
+lint = [{ name = "ruff" }]
+test = [
+    { name = "dask", extras = ["complete"] },
+    { name = "matplotlib" },
+    { name = "pooch", specifier = ">=1.8.2" },
+    { name = "pytest", specifier = ">=3.3.0" },
+    { name = "tqdm" },
+]
 
 [[package]]
 name = "six"

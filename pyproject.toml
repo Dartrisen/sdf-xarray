@@ -52,6 +52,12 @@ docs = [
   "pooch>=1.8.2",
   "tqdm",
 ]
+jupyter = ["dask[diagnostics]", "ipykernel>=6.29.5"]
+pint = ["pint", "pint-xarray"]
+
+[dependency-groups]
+build = ["cibuildwheel[uv]"]
+lint = ["ruff"]
 test = [
   "pytest >= 3.3.0",
   "dask[complete]",
@@ -59,10 +65,6 @@ test = [
   "pooch>=1.8.2",
   "tqdm",
 ]
-lint = ["ruff"]
-build = ["cibuildwheel[uv]"]
-jupyter = ["dask[diagnostics]", "ipykernel>=6.29.5"]
-pint = ["pint", "pint-xarray"]
 
 [project.entry-points."xarray.backends"]
 sdf_engine = "sdf_xarray:SDFEntrypoint"
@@ -113,4 +115,7 @@ ignore = [
   "PLR2004", # magic-comparison
   "B9",      # flake8-bugbear opinionated warnings
   "PLR0913", # remove maximum number of arguments in a function
+]
+exclude = [
+  "**/_version.py", # Auto-generated file
 ]

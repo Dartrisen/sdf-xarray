@@ -35,11 +35,23 @@ following tools:
 - [black](https://black.readthedocs.io/en/stable/) for formatting
 - [isort](https://pycqa.github.io/isort/) for sorting imports
 
-To run these tools locally, install the optional dependencies and run:
+To run these tools locally, install the `lint` dependency group:
 
 ```bash
-pip install "sdf-xarray[lint]"
+pip install --group lint
+```
+
+Ruff can then be run with:
+
+```bash
 ruff check src tests
+```
+
+Alternatively, `uv` users can use `uv run` to run the tools without installing
+them to their Python environment:
+
+```bash
+uv run ruff check src tests
 ```
 
 ### Running and adding tests
@@ -54,8 +66,14 @@ in order to download the datasets.
 Before submitting code changes, ensure that all tests pass:
 
 ```bash
-pip install "sdf-xarray[test]"
+pip install --group test
 pytest
+```
+
+Alternatively, `uv` users can use:
+
+```bash
+uv run pytest
 ```
 
 ## Documentation
