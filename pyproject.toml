@@ -56,6 +56,11 @@ jupyter = ["dask[diagnostics]", "ipykernel>=6.29.5"]
 pint = ["pint", "pint-xarray"]
 
 [dependency-groups]
+dev = [
+    {include-group = "build"},
+    {include-group = "lint"},
+    {include-group = "test"},
+]
 build = ["cibuildwheel[uv]"]
 lint = ["ruff"]
 test = [

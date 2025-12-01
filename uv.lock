@@ -2430,6 +2430,16 @@ build = [
     { name = "cibuildwheel", version = "2.23.3", source = { registry = "https://pypi.org/simple" }, extra = ["uv"], marker = "python_full_version < '3.11'" },
     { name = "cibuildwheel", version = "3.2.1", source = { registry = "https://pypi.org/simple" }, extra = ["uv"], marker = "python_full_version >= '3.11'" },
 ]
+dev = [
+    { name = "cibuildwheel", version = "2.23.3", source = { registry = "https://pypi.org/simple" }, extra = ["uv"], marker = "python_full_version < '3.11'" },
+    { name = "cibuildwheel", version = "3.2.1", source = { registry = "https://pypi.org/simple" }, extra = ["uv"], marker = "python_full_version >= '3.11'" },
+    { name = "dask", extra = ["complete"] },
+    { name = "matplotlib" },
+    { name = "pooch" },
+    { name = "pytest" },
+    { name = "ruff" },
+    { name = "tqdm" },
+]
 lint = [
     { name = "ruff" },
 ]
@@ -2469,6 +2479,15 @@ provides-extras = ["docs", "jupyter", "pint"]
 
 [package.metadata.requires-dev]
 build = [{ name = "cibuildwheel", extras = ["uv"] }]
+dev = [
+    { name = "cibuildwheel", extras = ["uv"] },
+    { name = "dask", extras = ["complete"] },
+    { name = "matplotlib" },
+    { name = "pooch", specifier = ">=1.8.2" },
+    { name = "pytest", specifier = ">=3.3.0" },
+    { name = "ruff" },
+    { name = "tqdm" },
+]
 lint = [{ name = "ruff" }]
 test = [
     { name = "dask", extras = ["complete"] },
