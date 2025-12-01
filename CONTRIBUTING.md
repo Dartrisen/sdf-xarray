@@ -47,8 +47,7 @@ Ruff can then be run with:
 ruff check src tests
 ```
 
-Alternatively, `uv` users can use `uv run` to run the tools without installing
-them to their Python environment:
+Alternatively, `uv` users can do this in one step with `uv run`:
 
 ```bash
 uv run ruff check src tests
