@@ -1,5 +1,3 @@
-from typing import Union
-
 import xarray as xr
 
 
@@ -13,7 +11,7 @@ class EpochAccessor:
         self,
         multiplier: float,
         unit_label: str,
-        coord_names: Union[str, list[str]],
+        coord_names: str | list[str],
     ) -> xr.Dataset:
         """
         Rescales specified X and Y coordinates in the Dataset by a given multiplier
