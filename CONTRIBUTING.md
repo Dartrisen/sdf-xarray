@@ -93,7 +93,7 @@ connection in order to download the datasets.
 To build the documentation locally, first install the required packages:
 
 ```bash
-pip install "sdf-xarray[docs]"
+pip install --group docs
 cd docs
 make html
 ```

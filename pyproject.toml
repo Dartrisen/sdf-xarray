@@ -36,6 +36,16 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
+jupyter = ["dask[diagnostics]", "ipykernel>=6.29.5"]
+pint = ["pint", "pint-xarray"]
+
+[dependency-groups]
+dev = [
+    {include-group = "build"},
+    {include-group = "docs"},
+    {include-group = "lint"},
+    {include-group = "test"},
+]
 docs = [
   "sphinx>=5.3",
   "sphinx_autodoc_typehints>=1.19",
@@ -51,15 +61,6 @@ docs = [
   "sphinx-copybutton",
   "pooch>=1.8.2",
   "tqdm",
-]
-jupyter = ["dask[diagnostics]", "ipykernel>=6.29.5"]
-pint = ["pint", "pint-xarray"]
-
-[dependency-groups]
-dev = [
-    {include-group = "build"},
-    {include-group = "lint"},
-    {include-group = "test"},
 ]
 build = ["cibuildwheel[uv]"]
 lint = ["ruff"]
