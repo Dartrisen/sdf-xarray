@@ -18,7 +18,7 @@ jobs:
 
     - name: Setup uv
       id: setup-uv
-      uses: astral-sh/setup-uv@v3
+      uses: astral-sh/setup-uv@v7
       with:
         enable-cache: true
 
@@ -28,7 +28,7 @@ jobs:
     - name: Set up Python ${{ matrix.python-version }} and install dependencies
       run: |
         uv python install ${{ matrix.python-version }}
-        uv sync --python ${{ matrix.python-version }} --extra test --extra build --frozen
+        uv sync --python ${{ matrix.python-version }} --frozen
 
     - name: Test with pytest
       run: uv run pytest

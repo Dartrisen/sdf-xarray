@@ -36,6 +36,16 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
+jupyter = ["dask[diagnostics]", "ipykernel>=6.29.5"]
+pint = ["pint", "pint-xarray"]
+
+[dependency-groups]
+dev = [
+    {include-group = "build"},
+    {include-group = "docs"},
+    {include-group = "lint"},
+    {include-group = "test"},
+]
 docs = [
   "sphinx>=5.3",
   "sphinx_autodoc_typehints>=1.19",
@@ -52,6 +62,8 @@ docs = [
   "pooch>=1.8.2",
   "tqdm",
 ]
+build = ["cibuildwheel[uv]"]
+lint = ["ruff"]
 test = [
   "pytest >= 3.3.0",
   "dask[complete]",
@@ -59,10 +71,6 @@ test = [
   "pooch>=1.8.2",
   "tqdm",
 ]
-lint = ["ruff"]
-build = ["cibuildwheel[uv]"]
-jupyter = ["dask[diagnostics]", "ipykernel>=6.29.5"]
-pint = ["pint", "pint-xarray"]
 
 [project.entry-points."xarray.backends"]
 sdf_engine = "sdf_xarray:SDFEntrypoint"
@@ -77,7 +85,7 @@ write_to = "src/sdf_xarray/_version.py"
 [tool.cibuildwheel]
 build-frontend = "build[uv]"
 skip = ["*-win32", "*-manylinux_i686", "pp*", "*musllinux*"]
-test-extras = ["test"]
+test-groups = ["test"]
 test-command = "pytest {project}/tests"
 
 [tool.uv]
@@ -113,4 +121,7 @@ ignore = [
   "PLR2004", # magic-comparison
   "B9",      # flake8-bugbear opinionated warnings
   "PLR0913", # remove maximum number of arguments in a function
+]
+exclude = [
+  "**/_version.py", # Auto-generated file
 ]
