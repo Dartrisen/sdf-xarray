@@ -169,7 +169,12 @@ def animate(
         # Prevents figure from prematurely displaying in Jupyter notebook
         plt.close(fig)
 
-    # Makes a list of coordinates in data.
+    # Sets the animation coordinate (t) for iteration. If time is in the coords
+    # then it will set time to be t. If it is not it will fallback to the last
+    # coordinate passed in. By default coordinates are passed in from xarray in
+    # the form x, y, z so in order to preserve the x and y being on their
+    # respective axes we animate over the final coordinate that is passed in
+    # which in this example is z
     coord_names = list(data.dims)
     if t is None:
         t = "time" if "time" in coord_names else coord_names[-1]
