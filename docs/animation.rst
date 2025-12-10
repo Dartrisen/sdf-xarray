@@ -197,8 +197,9 @@ Advanced usage
 Multiple plots on the same axes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Here is an example of how to combine multiple animations to plot on the same axis, 
-this may become a more user-friendly function in a future update.
+What follows is an example of how to combine multiple animations on the
+same axis. This may be implemented in a more user-friendly function in
+a future update.
 
 .. jupyter-execute::
 
