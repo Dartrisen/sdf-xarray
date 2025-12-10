@@ -51,7 +51,7 @@ def get_frame_title(
 
 def calculate_window_boundaries(
     data: xr.DataArray,
-    xlim: tuple[float, float] | bool = False,
+    xlim: tuple[float, float] | None = None,
     x_axis_name: str = "X_Grid_mid",
     t: str = "time",
 ) -> np.ndarray:
@@ -88,7 +88,7 @@ def calculate_window_boundaries(
         window_boundaries[i, 1] = x_grid_non_nan[-1] + x_half_cell
 
     # User's choice for initial window edge supercides the one calculated
-    if xlim:
+    if xlim is not None:
         window_boundaries = window_boundaries + xlim - window_boundaries[0]
     return window_boundaries
 
@@ -216,7 +216,7 @@ def animate(
     move_window = np.isnan(np.sum(data.values))
     if move_window:
         window_boundaries = calculate_window_boundaries(
-            data, kwargs.get("xlim", False), kwargs["x"]
+            data, kwargs.get("xlim"), kwargs["x"]
         )
 
     def update(frame):
