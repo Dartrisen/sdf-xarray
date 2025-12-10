@@ -70,7 +70,7 @@ It is important to note that since the dataset is time resolved, it has
    
    where ``.gif`` can be replaced with any supported file format.
 
-   It can also be shown in a regular python interface with
+   It can also be viewed from a Python interpreter with:
 
    .. code-block:: bash
 
