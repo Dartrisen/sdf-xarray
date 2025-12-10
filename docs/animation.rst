@@ -52,7 +52,7 @@ It is important to note that since the dataset is time resolved, it has
    # Open the SDF files
    ds = sdfxr.open_mfdataset("tutorial_dataset_1d/*.sdf")
    
-   # Get the DataArray variable out of the Dataset
+   # Access a DataArray within the Dataset
    da = ds["Derived_Number_Density_Electron"]
 
    # Create the FuncAnimation object
