@@ -104,7 +104,7 @@ plot it as a `xarray.plot.line`.
 ~~~~~~~~~~~~~
 
 Opening a 3D simulation as a multi-file dataset and plotting it will
-automatically return a `xarray.plot.hist`, this however might not be
+return a `xarray.plot.hist`. However, this may not be
 desirable. We can plot a 3D simulation along a certain plane in the
 same way a 2D simulation can be plotted along a line.
 
