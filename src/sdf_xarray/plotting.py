@@ -166,6 +166,7 @@ def animate(
     # Create plot if no ax is provided
     if ax is None:
         fig, ax = plt.subplots()
+        # Prevents figure from prematurely displaying in Jupyter notebook
         plt.close(fig)
 
     # Makes a list of coordinates in data.
