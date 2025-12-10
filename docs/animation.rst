@@ -158,7 +158,7 @@ accordingly.
 .. warning::
    Importing some datasets with moving windows can cause vertical banding
    in the `xarray.Dataset`, which will affect the animation. The cause for
-   this is unkown but can be circumvented by setting ``join = "override"``.
+   this is unknown but can be circumvented by setting ``join = "override"``.
 
 Customisation
 -------------
