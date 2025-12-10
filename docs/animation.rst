@@ -133,7 +133,7 @@ Moving window
 EPOCH allows for simulations that have a moving simulation window
 (changing x-axis over time). |animate_accessor| will
 automatically detect when a simulation has a moving window by searching 
-for NaNs in the `xarray.DataArray`; and change the x-axis limits
+for NaNs in the `xarray.DataArray` and change the x-axis limits
 accordingly.
 
 .. warning::
