@@ -129,6 +129,23 @@ multiple files).
 
    xr.open_dataset("tutorial_dataset_1d/0010.sdf", keep_particles=True)
 
+Loading specific variables
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When loading datasets containing several (``>10``) coordinates/dimensions
+using `sdf_xarray.open_mfdataset`, ``xarray`` may struggle to locate
+the necessary RAM to concatenate all of the data (as seen in
+`Issue #57 <https://github.com/epochpic/sdf-xarray/issues/57>`_).
+In this instance, you can optimize memory usage by loading only the data
+you need using the keyword argument ``data_vars`` and passing one or more
+variables. This creates a dataset consisting only of the given variable(s)
+and the relevant coordinates/dimensions, significantly reducing memory
+consumption.
+
+.. jupyter-execute::
+
+   sdfxr.open_mfdataset("tutorial_dataset_1d/*.sdf", data_vars=["Electric_Field_Ex"])
+
 Data interaction examples
 -------------------------
 
