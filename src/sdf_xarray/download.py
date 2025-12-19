@@ -54,7 +54,7 @@ def fetch_dataset(
     logger = pooch.get_logger()
     datasets = pooch.create(
         path=pooch.os_cache("sdf_datasets"),
-        base_url="doi:10.5281/zenodo.17618510",
+        base_url="doi:10.5281/zenodo.17618509",
         registry={
             "test_array_no_grids.zip": "md5:583c85ed8c31d0e34e7766b6d9f2d6da",
             "test_dist_fn.zip": "md5:a582ff5e8c59bad62fe4897f65fc7a11",
