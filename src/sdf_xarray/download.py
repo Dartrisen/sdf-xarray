@@ -64,7 +64,7 @@ def fetch_dataset(
             "test_mismatched_files.zip": "md5:710fdc94666edf7777523e8fc9dd1bd4",
             "test_two_probes_2D.zip": "md5:0f2a4fefe84a15292d066b3320d4d533",
             "tutorial_dataset_1d.zip": "md5:7fad744d8b8b2b84bba5c0e705fdef7b",
-            "tutorial_dataset_2d.zip": "md5:1945ecdbc1ac1798164f83ea2b3d1b31",
+            "tutorial_dataset_2d.zip": "md5:b7f35c05703a48eb5128049cdd106ffa",
             "tutorial_dataset_2d_moving_window.zip": "md5:a795f40d18df69263842055de4559501",
             "tutorial_dataset_3d.zip": "md5:d9254648867016292440fdb028f717f7",
         },
