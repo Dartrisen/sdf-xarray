@@ -68,6 +68,7 @@ def fetch_dataset(
             "tutorial_dataset_2d_moving_window.zip": "md5:a795f40d18df69263842055de4559501",
             "tutorial_dataset_3d.zip": "md5:d9254648867016292440fdb028f717f7",
         },
+        retry_if_failed=10,
     )
 
     datasets.fetch(
