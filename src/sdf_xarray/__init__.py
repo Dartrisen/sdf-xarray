@@ -103,13 +103,15 @@ def _build_datatree_from_dataset(
     Below are some examples of how variable names are translated from the
     regular `xarray.open_dataset` result into their more traditional names.
 
-    ```
-    Derived_Number_Density -> Derived/Number_Density/All
-    Derived_Number_Density_Electron -> Derived/Number_Density/Electron
-    Derived_Number_Density_Ion -> Derived/Number_Density/Ion
-    Derived_Number_Density_Electron -> Derived/Number_Density/Electron
-    Derived_Average_Particle_Energy -> Derived/Average_Particle_Energy
-    ```
+    =================================== ===================================
+    Dataset variable name               DataTree variable name
+    =================================== ===================================
+    ``Derived_Number_Density``          ``Derived/Number_Density/All``
+    ``Derived_Number_Density_Electron`` ``Derived/Number_Density/Electron``
+    ``Derived_Number_Density_Ion``      ``Derived/Number_Density/Ion``
+    ``Derived_Number_Density_Electron`` ``Derived/Number_Density/Electron``
+    ``Derived_Average_Particle_Energy`` ``Derived/Average_Particle_Energy``
+    =================================== ===================================
 
     Parameters
     ----------
@@ -310,13 +312,15 @@ def open_datatree(
     Below are some examples of how variable names are translated from the
     regular `xarray.open_dataset` result into their more traditional names.
 
-    ```
-    Derived_Number_Density -> Derived/Number_Density/All
-    Derived_Number_Density_Electron -> Derived/Number_Density/Electron
-    Derived_Number_Density_Ion -> Derived/Number_Density/Ion
-    Derived_Number_Density_Electron -> Derived/Number_Density/Electron
-    Derived_Average_Particle_Energy -> Derived/Average_Particle_Energy
-    ```
+    =================================== ===================================
+    Dataset variable name               DataTree variable name
+    =================================== ===================================
+    ``Derived_Number_Density``          ``Derived/Number_Density/All``
+    ``Derived_Number_Density_Electron`` ``Derived/Number_Density/Electron``
+    ``Derived_Number_Density_Ion``      ``Derived/Number_Density/Ion``
+    ``Derived_Number_Density_Electron`` ``Derived/Number_Density/Electron``
+    ``Derived_Average_Particle_Energy`` ``Derived/Average_Particle_Energy``
+    =================================== ===================================
 
     Parameters
     ----------
@@ -363,13 +367,15 @@ def open_mfdatatree(
     Below are some examples of how variable names are translated from the
     regular `xarray.open_dataset` result into their more traditional names.
 
-    ```
-    Derived_Number_Density -> Derived/Number_Density/All
-    Derived_Number_Density_Electron -> Derived/Number_Density/Electron
-    Derived_Number_Density_Ion -> Derived/Number_Density/Ion
-    Derived_Number_Density_Electron -> Derived/Number_Density/Electron
-    Derived_Average_Particle_Energy -> Derived/Average_Particle_Energy
-    ```
+    =================================== ===================================
+    Dataset variable name               DataTree variable name
+    =================================== ===================================
+    ``Derived_Number_Density``          ``Derived/Number_Density/All``
+    ``Derived_Number_Density_Electron`` ``Derived/Number_Density/Electron``
+    ``Derived_Number_Density_Ion``      ``Derived/Number_Density/Ion``
+    ``Derived_Number_Density_Electron`` ``Derived/Number_Density/Electron``
+    ``Derived_Average_Particle_Energy`` ``Derived/Average_Particle_Energy``
+    =================================== ===================================
 
     Parameters
     ----------
