@@ -7,7 +7,7 @@ from importlib.metadata import version
 from itertools import product
 from os import PathLike as os_PathLike
 from pathlib import Path
-from typing import ClassVar
+from typing import ClassVar, TYPE_CHECKING
 
 import numpy as np
 import xarray as xr
@@ -35,6 +35,9 @@ from .sdf_interface import Constant, SDFFile  # type: ignore  # noqa: PGH003
 # TODO Remove this once the new kwarg options are fully implemented
 if Version(version("xarray")) >= Version("2025.8.0"):
     xr.set_options(use_new_combine_kwarg_defaults=True)
+
+if TYPE_CHECKING:
+    import epydeck
 
 PathLike = str | os_PathLike
 
@@ -306,6 +309,7 @@ class SDFDataStore(AbstractDataStore):
         "keep_particles",
         "lock",
         "probe_names",
+        "load_deck",
     )
 
     def __init__(
@@ -315,6 +319,7 @@ class SDFDataStore(AbstractDataStore):
         keep_particles=False,
         lock=None,
         probe_names=None,
+        load_deck=False
     ):
         self._manager = manager
         self._filename = self.ds.filename
@@ -322,6 +327,7 @@ class SDFDataStore(AbstractDataStore):
         self.keep_particles = keep_particles
         self.lock = ensure_lock(lock)
         self.probe_names = probe_names
+        self.load_deck = load_deck
 
     @classmethod
     def open(
@@ -331,6 +337,7 @@ class SDFDataStore(AbstractDataStore):
         drop_variables=None,
         keep_particles=False,
         probe_names=None,
+        load_deck=False,
     ):
         if isinstance(filename, os.PathLike):
             filename = os.fspath(filename)
@@ -342,6 +349,7 @@ class SDFDataStore(AbstractDataStore):
             drop_variables=drop_variables,
             keep_particles=keep_particles,
             probe_names=probe_names,
+            load_deck=load_deck,
         )
 
     def _acquire(self, needs_lock=True):
@@ -373,6 +381,12 @@ class SDFDataStore(AbstractDataStore):
 
         # These two dicts are global metadata about the run or file
         attrs = {**self.ds.header, **self.ds.run_info}
+
+        if self.load_deck:
+            import epydeck  # type: ignore  # noqa: PGH003
+            deck_path = Path(attrs["filename"]).parent / "input.deck"
+            with open(deck_path, encoding="utf-8") as f:
+                attrs["deck"] = epydeck.load(f)
 
         data_vars = {}
         coords = {}
@@ -541,6 +555,7 @@ class SDFEntrypoint(BackendEntrypoint):
         drop_variables=None,
         keep_particles=False,
         probe_names=None,
+        load_deck=False
     ):
         if isinstance(filename_or_obj, Path):
             # sdf library takes a filename only
@@ -552,6 +567,7 @@ class SDFEntrypoint(BackendEntrypoint):
             drop_variables=drop_variables,
             keep_particles=keep_particles,
             probe_names=probe_names,
+            load_deck=load_deck,
         )
         with close_on_error(store):
             return store.load()
@@ -561,6 +577,7 @@ class SDFEntrypoint(BackendEntrypoint):
         "drop_variables",
         "keep_particles",
         "probe_names",
+        "load_deck",
     ]
 
     def guess_can_open(self, filename_or_obj):
