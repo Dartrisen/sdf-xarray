@@ -319,7 +319,7 @@ class SDFDataStore(AbstractDataStore):
         keep_particles=False,
         lock=None,
         probe_names=None,
-        load_deck=False
+        load_deck: bool|str|Path = False
     ):
         self._manager = manager
         self._filename = self.ds.filename
@@ -384,7 +384,15 @@ class SDFDataStore(AbstractDataStore):
 
         if self.load_deck:
             import epydeck  # type: ignore  # noqa: PGH003
-            deck_path = Path(attrs["filename"]).parent / "input.deck"
+
+            sdf_dir = Path(attrs["filename"]).parent
+
+            if isinstance(self.load_deck, (str, Path)):
+                path = Path(self.load_deck)
+                deck_path = path if path.is_absolute() else sdf_dir / path
+            else:
+                deck_path = sdf_dir / "input.deck"
+
             with open(deck_path, encoding="utf-8") as f:
                 attrs["deck"] = epydeck.load(f)
 
