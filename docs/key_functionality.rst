@@ -146,6 +146,25 @@ consumption.
 
    sdfxr.open_mfdataset("tutorial_dataset_1d/*.sdf", data_vars=["Electric_Field_Ex"])
 
+Optional loading input.deck file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+When loading SDF files, you can optionally include the `input.deck` file
+used to generate the simulation. This file contains important simulation
+parameters that may not be present in the SDF outputs. By loading this file,
+you can access these parameters as part of your dataset's metadata.
+To do this, use the ``input_deck`` parameter when calling
+`sdf_xarray.open_dataset`.
+
+By default the ``input_deck`` parameter is set to ``False``. You can set it to
+``True`` to automatically search for an `input.deck` file in the same directory
+as the SDF file being loaded, or you can provide a specific path to the
+`input.deck` file as a path variable or string.
+
+.. jupyter-execute::
+
+   ds = xr.open_dataset("tutorial_dataset_1d/0010.sdf", load_deck=True)
+   ds.attrs["deck"]
+
 Data interaction examples
 -------------------------
 
