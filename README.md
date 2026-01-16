@@ -6,7 +6,7 @@
 ![Build/Publish](https://github.com/epochpic/sdf-xarray/actions/workflows/build_publish.yml/badge.svg)
 ![Tests](https://github.com/epochpic/sdf-xarray/actions/workflows/tests.yml/badge.svg)
 [![Read the Docs](https://img.shields.io/readthedocs/sdf-xarray?logo=readthedocs&link=https%3A%2F%2Fsdf-xarray.readthedocs.io%2F)](https://sdf-xarray.readthedocs.io)
-[![Formatted with black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/python/black)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
 
 sdf-xarray provides a backend for [xarray](https://xarray.dev) to read SDF files as created by
