@@ -171,21 +171,28 @@ To do this, use the ``input_deck`` parameter when calling
 `sdf_xarray.open_dataset`.
 
 .. note::
-   You may need to install the `sdf-xarray[deck]` extra dependencies
+   You may need to install the `epydeck` extra dependencies
    to enable this functionality. You can do this via pip:
+
    .. code-block:: bash
 
-      pip install "sdf-xarray[deck]"
+        pip install "epydeck"
 
 By default the ``input_deck`` parameter is set to ``False``. You can set it to
 ``True`` to automatically search for an `input.deck` file in the same directory
 as the SDF file being loaded, or you can provide a specific path to the
 `input.deck` file as a path variable or string.
 
-.. jupyter-execute::
+.. toggle::
 
-   ds = xr.open_dataset("tutorial_dataset_1d/0010.sdf", load_deck=True)
-   ds.attrs["deck"]
+   .. jupyter-execute::
+
+      import json
+      from IPython.display import Code
+
+      ds = xr.open_dataset("tutorial_dataset_1d/0010.sdf", load_deck=True)
+      json_str = json.dumps(ds.attrs["deck"], indent=4)
+      Code(json_str, language='json')
 
 Data interaction examples
 -------------------------

@@ -50,7 +50,11 @@ extensions = [
     "myst_parser",
     "jupyter_sphinx",
     "sphinx_copybutton",
+    "sphinx_togglebutton",
 ]
+
+togglebutton_hint = "Click to show input.deck"
+togglebutton_hint_hide = "Click to hide input.deck"
 
 autosummary_generate = True
 
