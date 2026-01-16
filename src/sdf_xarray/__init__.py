@@ -7,7 +7,7 @@ from importlib.metadata import version
 from itertools import product
 from os import PathLike as os_PathLike
 from pathlib import Path
-from typing import ClassVar, TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 import numpy as np
 import xarray as xr
@@ -38,7 +38,7 @@ if Version(version("xarray")) >= Version("2025.8.0"):
     xr.set_options(use_new_combine_kwarg_defaults=True)
 
 if TYPE_CHECKING:
-    import epydeck
+    import epydeck  # noqa: F401
 
 PathLike = str | os_PathLike
 
@@ -516,9 +516,9 @@ class SDFDataStore(AbstractDataStore):
         "_manager",
         "drop_variables",
         "keep_particles",
+        "load_deck",
         "lock",
         "probe_names",
-        "load_deck",
     )
 
     def __init__(
@@ -592,7 +592,7 @@ class SDFDataStore(AbstractDataStore):
         attrs = {**self.ds.header, **self.ds.run_info}
 
         if self.load_deck:
-            import epydeck  # type: ignore  # noqa: PGH003
+            import epydeck  # noqa: PLC0415
 
             sdf_dir = Path(attrs["filename"]).parent
 
@@ -602,7 +602,7 @@ class SDFDataStore(AbstractDataStore):
             else:
                 deck_path = sdf_dir / "input.deck"
 
-            with open(deck_path, encoding="utf-8") as f:
+            with Path.open(deck_path, encoding="utf-8") as f:
                 attrs["deck"] = epydeck.load(f)
 
         data_vars = {}
