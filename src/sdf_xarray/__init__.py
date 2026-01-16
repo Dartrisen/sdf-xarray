@@ -528,7 +528,7 @@ class SDFDataStore(AbstractDataStore):
         keep_particles=False,
         lock=None,
         probe_names=None,
-        load_deck: bool|str|Path = False
+        load_deck: bool | str | Path = False,
     ):
         self._manager = manager
         self._filename = self.ds.filename
@@ -801,7 +801,7 @@ class SDFEntrypoint(BackendEntrypoint):
         drop_variables=None,
         keep_particles=False,
         probe_names=None,
-        load_deck=False
+        load_deck=False,
     ):
         if isinstance(filename_or_obj, Path):
             # sdf library takes a filename only
