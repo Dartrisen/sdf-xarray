@@ -15,8 +15,8 @@ Loading SDF files
 -----------------
 There are several ways to load SDF files:
 
-- To load a single file, use `xarray.open_dataset`.
-- To load multiple files, use `sdf_xarray.open_mfdataset` or `xarray.open_mfdataset`.
+- To load a single file, use `xarray.open_dataset`, `sdf_xarray.open_datatree` or `xarray.open_datatree`
+- To load multiple files, use `sdf_xarray.open_mfdataset`, `xarray.open_mfdataset` or `sdf_xarray.open_mfdatatree`.
 - To access the raw contents of a single SDF file, use `sdf_xarray.sdf_interface.SDFFile`.
 
 .. note::
@@ -41,6 +41,13 @@ Loading single files
 
    xr.open_dataset("tutorial_dataset_1d/0010.sdf")
 
+Alternatively, you can load the data in as a `xarray.DataTree`, which organises the data
+hierarchically into ``groups`` (for example grouping related quantities such as the individual
+components of the electric and magnetic fields) while keeping each item as a `xarray.Dataset`.
+
+.. jupyter-execute::
+
+   sdfxr.open_datatree("tutorial_dataset_1d/0010.sdf")
 
 .. _loading-raw-files:
 
@@ -71,6 +78,14 @@ is by using the `sdf_xarray.open_mfdataset`.
 .. jupyter-execute::
 
    sdfxr.open_mfdataset("tutorial_dataset_1d/*.sdf")
+
+Alternatively, you can load the data in as a `xarray.DataTree`, which organises the data
+hierarchically into ``groups`` (for example grouping related quantities such as the individual
+components of the electric and magnetic fields) while keeping each item as a `xarray.Dataset`.
+
+.. jupyter-execute::
+
+   sdfxr.open_mfdatatree("tutorial_dataset_1d/*.sdf")
 
 Alternatively files can be loaded using `xarray.open_mfdataset` however when loading in
 all the files we have do some processing of the data so that we can correctly align it along
@@ -218,6 +233,44 @@ value intead of an index.
 .. jupyter-execute::
 
    ds["Electric_Field_Ex"].sel(time=sim_time)
+
+Visualisation on HPCs
+---------------------
+
+In many cases you will be running EPOCH simulations via a HPC cluster and your
+subsequent SDF files will probably be rather large and cumbersome to interact with
+via traditional Jupyter notebooks. In some cases your HPC may outright block the
+use of Jupyter notebooks entirely. To circumvent this issue you can use a Terminal
+User Interface (TUI) which renders the contents of SDF files directly in a Terminal
+and allows for you to do some simple data analysis and visualisation. To do this we
+shall leverage the `xr-tui <https://github.com/samueljackson92/xr-tui>`_ package
+which can be installed to either a venv or globally using:
+
+.. code-block:: bash
+
+   pip install xr-tui sdf-xarray
+
+or if you are using ``uv``
+
+.. code-block:: bash
+
+   uv tool install xr-tui --with sdf-xarray
+
+Once installed you can visualise SDF files by simply writing in the command line
+
+.. code-block:: bash
+
+   xr path/to/simulation/0000.sdf
+   # OR
+   xr path/to/simulation/*.sdf
+
+
+Below is an example gif of how this interfacing looks as seen on
+`xr-tui <https://github.com/samueljackson92/xr-tui>`_ ``README.md``:
+
+.. image:: https://raw.githubusercontent.com/samueljackson92/xr-tui/main/demo.gif
+   :alt: xr-tui interfacing gif
+   :align: center
 
 Manipulating data
 -----------------
