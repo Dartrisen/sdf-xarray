@@ -89,6 +89,63 @@ def _resolve_glob(path_glob: PathLike | Iterable[PathLike]):
     return paths
 
 
+def _build_datatree_from_dataset(
+    ds: xr.Dataset,
+) -> xr.DataTree:
+    """
+    An `xarray.DataTree` is constructed utilising the original names in the SDF
+    file. This is due to the fact that these names include slashes which `xarray`
+    can use to automatically build up a datatree. We do additionally replace
+    spaces with underscores to be more pythonic. You can find the
+    `xarray.Dataset` name under the ``attrs["flat_structure_name"]`` for referencing.
+
+    In some cases the user may output the ``always + species`` dumpmask which
+    means that SDF variable will have species data plus a general one. When
+    defining a `xarray.DataTree` you cannot have a node of that tree contain both
+    variable information and have leaves with variables so we move the node
+    information to a leaf named ``node/All`` (see example of
+    ``Dervied/Number_Density/All`` in below table)
+
+    Below are some examples of how variable names are translated from the
+    regular `xarray.open_dataset` result into their more traditional names.
+
+    =================================== ===================================
+    Dataset variable name               DataTree variable name
+    =================================== ===================================
+    ``Derived_Number_Density``          ``Derived/Number_Density/All``
+    ``Derived_Number_Density_Electron`` ``Derived/Number_Density/Electron``
+    ``Derived_Number_Density_Ion``      ``Derived/Number_Density/Ion``
+    ``Derived_Number_Density_Photon``   ``Derived/Number_Density/Photon``
+    ``Derived_Average_Particle_Energy`` ``Derived/Average_Particle_Energy``
+    =================================== ===================================
+
+    Parameters
+    ----------
+    ds
+        Incoming `xarray.Dataset` to convert to a `xarray.DataTree`
+    """
+    renames = {}
+    for name, var in ds.data_vars.items():
+        # Append the current variable name to the attributes
+        var.attrs["flat_structure_name"] = name
+        renames.update({name: var.attrs["full_name"].replace(" ", "_")})
+
+    new_names = renames.values()
+
+    final_renames = {
+        key: (
+            f"{path}/All"
+            if any(other.startswith(f"{path}/") for other in new_names)
+            else path
+        )
+        for key, path in renames.items()
+    }
+
+    ds = ds.rename_vars(final_renames)
+
+    return xr.DataTree.from_dict(ds)
+
+
 def purge_unselected_data_vars(ds: xr.Dataset, data_vars: list[str]) -> xr.Dataset:
     """
     If the user has exclusively requested only certain variables be
@@ -240,6 +297,147 @@ def open_mfdataset(
         join="outer",
         compat="no_conflicts",
     )
+
+
+def open_datatree(
+    path: PathLike,
+    *,
+    keep_particles: bool = False,
+    probe_names: list[str] | None = None,
+) -> xr.DataTree:
+    """
+    An `xarray.DataTree` is constructed utilising the original names in the SDF
+    file. This is due to the fact that these names include slashes which `xarray`
+    can use to automatically build up a datatree. We do additionally replace
+    spaces with underscores to be more pythonic. You can find the
+    `xarray.Dataset` name under the ``attrs["flat_structure_name"]`` for referencing.
+
+    In some cases the user may output the ``always + species`` dumpmask which
+    means that SDF variable will have species data plus a general one. When
+    defining a `xarray.DataTree` you cannot have a node of that tree contain both
+    variable information and have leaves with variables so we move the node
+    information to a leaf named ``node/All`` (see example of
+    ``Dervied/Number_Density/All`` in below table)
+
+    Below are some examples of how variable names are translated from the
+    regular `xarray.open_dataset` result into their more traditional names.
+
+    =================================== ===================================
+    Dataset variable name               DataTree variable name
+    =================================== ===================================
+    ``Derived_Number_Density``          ``Derived/Number_Density/All``
+    ``Derived_Number_Density_Electron`` ``Derived/Number_Density/Electron``
+    ``Derived_Number_Density_Ion``      ``Derived/Number_Density/Ion``
+    ``Derived_Number_Density_Photon``   ``Derived/Number_Density/Photon``
+    ``Derived_Average_Particle_Energy`` ``Derived/Average_Particle_Energy``
+    =================================== ===================================
+
+    Parameters
+    ----------
+    path
+        The path to the SDF file
+    keep_particles
+        If ``True``, also load particle data (this may use a lot of memory!)
+    probe_names
+        List of EPOCH probe names
+
+    Examples
+    --------
+    >>> dt = open_datatree("0000.sdf")
+    >>> dt["Electric_Field"]["Ex"].values  # Access all Electric_Field_Ex data
+    """
+
+    return xr.open_datatree(
+        path, keep_particles=keep_particles, probe_names=probe_names
+    )
+
+
+def open_mfdatatree(
+    path_glob: Iterable | str | Path | Callable[..., Iterable[Path]],
+    *,
+    separate_times: bool = False,
+    keep_particles: bool = False,
+    probe_names: list[str] | None = None,
+    data_vars: list[str] | None = None,
+) -> xr.DataTree:
+    """Open a set of EPOCH SDF files as one `xarray.DataTree`
+
+    EPOCH can output variables at different periods, so each individal
+    SDF file from one EPOCH run may have different variables in it. In
+    order to combine all files into one `xarray.Dataset`, we need to
+    concatenate variables across their time dimension.
+
+    We have two choices:
+
+    1. One time dimension where some variables may not be defined at all time
+       points, and so will be filled with NaNs at missing points; or
+    2. Multiple time dimensions, one for each output frequency
+
+    The second option is better for memory consumption, as the missing data with
+    the first option still takes up space. However, proper lazy-loading may
+    mitigate this.
+
+    The ``separate_times`` argument can be used to switch between these choices.
+
+    An `xarray.DataTree` is constructed utilising the original names in the SDF
+    file. This is due to the fact that these names include slashes which `xarray`
+    can use to automatically build up a datatree. We do additionally replace
+    spaces with underscores to be more pythonic. You can find the
+    `xarray.Dataset` name under the ``attrs["flat_structure_name"]`` for referencing.
+
+    This function combines multiple SDF files into a single `xarray.DataTree` with a
+    unified time dimension and hierarchical organization of variables.
+
+    In some cases the user may output the ``always + species`` dumpmask which
+    means that SDF variable will have species data plus a general one. When
+    defining a `xarray.DataTree` you cannot have a node of that tree contain both
+    variable information and have leaves with variables so we move the node
+    information to a leaf named ``node/All`` (see example of
+    ``Dervied/Number_Density/All`` in below table)
+
+    Below are some examples of how variable names are translated from the
+    regular `xarray.open_dataset` result into their more traditional names.
+
+    =================================== ===================================
+    Dataset variable name               DataTree variable name
+    =================================== ===================================
+    ``Derived_Number_Density``          ``Derived/Number_Density/All``
+    ``Derived_Number_Density_Electron`` ``Derived/Number_Density/Electron``
+    ``Derived_Number_Density_Ion``      ``Derived/Number_Density/Ion``
+    ``Derived_Number_Density_Photon``   ``Derived/Number_Density/Photon``
+    ``Derived_Average_Particle_Energy`` ``Derived/Average_Particle_Energy``
+    =================================== ===================================
+
+    Parameters
+    ----------
+    path_glob
+        List of filenames or string glob pattern
+    separate_times
+        If ``True``, create separate time dimensions for variables defined at
+        different output frequencies
+    keep_particles
+        If ``True``, also load particle data (this may use a lot of memory!)
+    probe_names
+        List of EPOCH probe names
+    data_vars
+        List of data vars to load in (If not specified loads in all variables)
+
+    Examples
+    --------
+    >>> dt = open_mfdatatree("*.sdf")
+    >>> dt["Electric_Field"]["Ex"].values  # Access all Electric_Field_Ex data
+    >>> dt.coords["time"].values  # Access combined time dimension
+    """
+    # First, combine the datasets as usual
+    combined_ds = open_mfdataset(
+        path_glob,
+        separate_times=separate_times,
+        keep_particles=keep_particles,
+        probe_names=probe_names,
+        data_vars=data_vars,
+    )
+
+    return _build_datatree_from_dataset(combined_ds)
 
 
 def make_time_dims(path_glob):
@@ -534,9 +732,9 @@ class SDFDataStore(AbstractDataStore):
                 grid_mid = self.ds.grids[value.grid_mid]
                 grid_mid_base_name = _process_grid_name(grid_mid.name, _norm_grid_name)
                 for dim_size, dim_name in zip(grid_mid.shape, grid_mid.labels):
-                    dim_size_lookup[dim_name][
-                        dim_size
-                    ] = f"{dim_name}_{grid_mid_base_name}"
+                    dim_size_lookup[dim_name][dim_size] = (
+                        f"{dim_name}_{grid_mid_base_name}"
+                    )
 
                 var_coords = [
                     dim_size_lookup[dim_name][dim_size]
@@ -588,6 +786,14 @@ class SDFDataStore(AbstractDataStore):
 
 
 class SDFEntrypoint(BackendEntrypoint):
+    supports_groups = True
+    open_dataset_parameters: ClassVar[list[str]] = [
+        "filename_or_obj",
+        "drop_variables",
+        "keep_particles",
+        "probe_names",
+    ]
+
     def open_dataset(
         self,
         filename_or_obj,
@@ -612,13 +818,29 @@ class SDFEntrypoint(BackendEntrypoint):
         with close_on_error(store):
             return store.load()
 
-    open_dataset_parameters: ClassVar[list[str]] = [
+    open_datatree_parameters: ClassVar[list[str]] = [
         "filename_or_obj",
         "drop_variables",
         "keep_particles",
         "probe_names",
         "load_deck",
     ]
+
+    def open_datatree(
+        self,
+        filename_or_obj,
+        *,
+        drop_variables=None,
+        keep_particles=False,
+        probe_names=None,
+    ):
+        ds = self.open_dataset(
+            filename_or_obj,
+            drop_variables=drop_variables,
+            keep_particles=keep_particles,
+            probe_names=probe_names,
+        )
+        return _build_datatree_from_dataset(ds)
 
     def guess_can_open(self, filename_or_obj):
         magic_number = try_read_magic_number_from_path(filename_or_obj)

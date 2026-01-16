@@ -1,11 +1,30 @@
 name: lint
-on: push
+
+on:
+  push:
+    paths:
+      - '**.py'
+  pull_request:
+    paths:
+      - '**.py'
+
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Ruff
+        with:
+          fetch-depth: 0
+
+      # Providing 'args' prevents the action from running 'ruff check .'
+      # immediately after installing ruff.
+      - name: Install Ruff
         uses: astral-sh/ruff-action@v3
-      - name: Run Ruff
+        with:
+          args: "--version"
+
+      - name: Check
         run: ruff check --output-format=github src tests
+
+      - name: Format
+        run: ruff format --check --diff src tests

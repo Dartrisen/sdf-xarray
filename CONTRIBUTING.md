@@ -28,14 +28,8 @@ pip install .
 
 ### Style
 
-We follow [PEP 8](https://peps.python.org/pep-0008/) and use the
-following tools:
-
-- [ruff](https://github.com/astral-sh/ruff) for linting
-- [black](https://black.readthedocs.io/en/stable/) for formatting
-- [isort](https://pycqa.github.io/isort/) for sorting imports
-
-To run these tools locally, install the `lint` dependency group:
+We use [Ruff](https://docs.astral.sh/ruff/) to maintain code quality and
+formatting. This can be installed locally via the `lint` dependency group:
 
 ```bash
 pip install --group lint
@@ -51,6 +45,20 @@ Alternatively, `uv` users can do this in one step with `uv run`:
 
 ```bash
 uv run ruff check src tests
+```
+
+Many of the issues raised by Ruff can be fixed automatically:
+
+```bash
+ruff check --fix src tests
+```
+
+Ruff may also be used to format the code to a style similar to that enforced by
+[Black](https://black.readthedocs.io/en/stable/), which (almost) matches the
+[PEP-8 standard](https://peps.python.org/pep-0008/):
+
+```bash
+ruff format src tests
 ```
 
 ### Running and adding tests
@@ -130,8 +138,8 @@ Then open http://localhost:8000 in your browser to view the documentation.
 
 All pull requests are automatically checked using GitHub Actions for:
 
-- Linting (`ruff`)
-- Formatting (`black` and `isort`)
+- Linting and formatting (`ruff`)
 - Testing (`pytest`)
+- Cross-platform building (`cibuildwheel`)
 
 These checks must pass before a pull request can be merged.
