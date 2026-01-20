@@ -531,7 +531,7 @@ class SDFDataStore(AbstractDataStore):
         load_deck: bool | str | Path = False,
     ):
         self._manager = manager
-        self._filename = self.ds.filename
+        self._filename = self.ds.header["filename"]
         self.drop_variables = drop_variables
         self.keep_particles = keep_particles
         self.lock = ensure_lock(lock)
