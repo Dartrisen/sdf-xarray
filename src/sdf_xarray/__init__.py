@@ -829,6 +829,11 @@ class SDFEntrypoint(BackendEntrypoint):
     url = "https://epochpic.github.io/documentation/visualising_output/python_beam.html"
 
 
+class XrTUIEntrpoint:
+    def open_mfdatatree(self, paths: list[Path]) -> xr.Datatree:
+        return open_mfdatatree(paths)
+
+
 class SDFPreprocess:
     """Preprocess SDF files for xarray ensuring matching job ids and sets
     time dimension.
