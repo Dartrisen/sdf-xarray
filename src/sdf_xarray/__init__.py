@@ -830,7 +830,7 @@ class SDFEntrypoint(BackendEntrypoint):
 
 
 class XrTUIEntrpoint:
-    def open_mfdatatree(self, paths: list[Path]) -> xr.Datatree:
+    def open_mfdatatree(self, paths: list[Path]) -> xr.DataTree:
         return open_mfdatatree(paths)
 
 
