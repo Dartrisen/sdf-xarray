@@ -139,8 +139,9 @@ def _build_datatree_from_dataset(
     }
 
     ds = ds.rename_vars(final_renames)
-
-    return xr.DataTree.from_dict(ds)
+    dt = xr.DataTree.from_dict(ds)
+    dt.attrs = ds.attrs
+    return dt
 
 
 def purge_unselected_data_vars(ds: xr.Dataset, data_vars: list[str]) -> xr.Dataset:
