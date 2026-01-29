@@ -38,7 +38,7 @@ if Version(version("xarray")) >= Version("2025.8.0"):
     xr.set_options(use_new_combine_kwarg_defaults=True)
 
 if TYPE_CHECKING:
-    import epydeck  # noqa: F401
+    import epydeck
 
 PathLike = str | os_PathLike
 
@@ -49,6 +49,7 @@ def _rename_with_underscore(name: str) -> str:
     return name.replace("/", "_").replace(" ", "_").replace("-", "_")
 
 def _load_deck(load_deck: bool | PathLike, sdf_filename: PathLike) -> "epydeck.Deck":
+    """Load an EPOCH input deck."""
     import epydeck  # noqa: PLC0415
 
     sdf_dir = Path(sdf_filename).parent
@@ -59,7 +60,7 @@ def _load_deck(load_deck: bool | PathLike, sdf_filename: PathLike) -> "epydeck.D
         path = Path(load_deck)
         deck_path = path if path.is_absolute() else sdf_dir / path
 
-    with open(deck_path) as f:
+    with Path.open(deck_path) as f:
         return epydeck.load(f)
 
 
