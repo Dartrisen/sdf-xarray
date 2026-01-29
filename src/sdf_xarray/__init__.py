@@ -48,6 +48,20 @@ def _rename_with_underscore(name: str) -> str:
     are not valid in netCDF names so we replace them with underscores."""
     return name.replace("/", "_").replace(" ", "_").replace("-", "_")
 
+def _load_deck(load_deck: bool | PathLike, sdf_filename: PathLike) -> "epydeck.Deck":
+    import epydeck  # noqa: PLC0415
+
+    sdf_dir = Path(sdf_filename).parent
+
+    if load_deck is True:
+        deck_path = sdf_dir / "input.deck"
+    else:
+        path = Path(load_deck)
+        deck_path = path if path.is_absolute() else sdf_dir / path
+
+    with open(deck_path) as f:
+        return epydeck.load(f)
+
 
 def _process_latex_name(variable_name: str) -> str:
     """Converts variable names to LaTeX format where possible
@@ -592,18 +606,7 @@ class SDFDataStore(AbstractDataStore):
         attrs = {**self.ds.header, **self.ds.run_info}
 
         if self.load_deck:
-            import epydeck  # noqa: PLC0415
-
-            sdf_dir = Path(self._filename).parent
-
-            if isinstance(self.load_deck, PathLike):
-                path = Path(self.load_deck)
-                deck_path = path if path.is_absolute() else sdf_dir / path
-            else:
-                deck_path = sdf_dir / "input.deck"
-
-            with Path.open(deck_path) as f:
-                attrs["deck"] = epydeck.load(f)
+            attrs["deck"] = _load_deck(self.load_deck, self._filename)
 
         data_vars = {}
         coords = {}
