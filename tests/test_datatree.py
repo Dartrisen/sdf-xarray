@@ -27,6 +27,12 @@ def test_datatree_basic():
     assert not any(g for g in dt.groups if g.endswith("/Particles"))
 
 
+def test_datatree_attrs():
+    dt = open_datatree(TEST_FILES_DIR / "0000.sdf")
+    assert dt.attrs != {}
+    assert dt.attrs["code_name"] == "Epoch1d"
+
+
 def test_datatree_constant_name_and_units():
     dt = open_datatree(TEST_FILES_DIR / "0000.sdf")
     # Absorption group with constants

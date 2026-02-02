@@ -157,8 +157,9 @@ def _build_datatree_from_dataset(
     }
 
     ds = ds.rename_vars(final_renames)
-
-    return xr.DataTree.from_dict(ds)
+    dt = xr.DataTree.from_dict(ds)
+    dt.attrs = ds.attrs
+    return dt
 
 
 def purge_unselected_data_vars(ds: xr.Dataset, data_vars: list[str]) -> xr.Dataset:
@@ -856,6 +857,11 @@ class SDFEntrypoint(BackendEntrypoint):
     description = "Use .sdf files in Xarray"
 
     url = "https://epochpic.github.io/documentation/visualising_output/python_beam.html"
+
+
+class XrTUIEntrpoint:
+    def open_mfdatatree(self, paths: list[Path]) -> xr.DataTree:
+        return open_mfdatatree(paths)
 
 
 class SDFPreprocess:
