@@ -7,7 +7,7 @@ from importlib.metadata import version
 from itertools import product
 from os import PathLike as os_PathLike
 from pathlib import Path
-from typing import TYPE_CHECKING, ClassVar
+from typing import ClassVar
 
 import numpy as np
 import xarray as xr
@@ -37,9 +37,6 @@ from .sdf_interface import Constant, SDFFile  # type: ignore  # noqa: PGH003
 if Version(version("xarray")) >= Version("2025.8.0"):
     xr.set_options(use_new_combine_kwarg_defaults=True)
 
-if TYPE_CHECKING:
-    import epydeck
-
 PathLike = str | os_PathLike
 
 
@@ -48,7 +45,8 @@ def _rename_with_underscore(name: str) -> str:
     are not valid in netCDF names so we replace them with underscores."""
     return name.replace("/", "_").replace(" ", "_").replace("-", "_")
 
-def _load_deck(load_deck: bool | PathLike, sdf_filename: PathLike) -> "epydeck.Deck":
+
+def _load_deck(load_deck: bool | PathLike, sdf_filename: PathLike) -> dict:
     """Load an EPOCH input deck."""
     import epydeck  # noqa: PLC0415
 
@@ -60,7 +58,7 @@ def _load_deck(load_deck: bool | PathLike, sdf_filename: PathLike) -> "epydeck.D
         path = Path(load_deck)
         deck_path = path if path.is_absolute() else sdf_dir / path
 
-    with Path.open(deck_path) as f:
+    with deck_path.open() as f:
         return epydeck.load(f)
 
 
@@ -183,7 +181,10 @@ def purge_unselected_data_vars(ds: xr.Dataset, data_vars: list[str]) -> xr.Datas
 
 
 def combine_datasets(
-    path_glob: Iterable | str, data_vars: list[str], **kwargs
+    path_glob: Iterable | str,
+    data_vars: list[str],
+    load_deck: bool | PathLike = False,
+    **kwargs,
 ) -> xr.Dataset:
     """
     Combine all datasets using a single time dimension, optionally extract
@@ -191,7 +192,7 @@ def combine_datasets(
     """
 
     if data_vars is not None:
-        return xr.open_mfdataset(
+        ds = xr.open_mfdataset(
             path_glob,
             join="outer",
             coords="different",
@@ -201,16 +202,19 @@ def combine_datasets(
             preprocess=SDFPreprocess(data_vars=data_vars),
             **kwargs,
         )
-
-    return xr.open_mfdataset(
-        path_glob,
-        data_vars="all",
-        coords="different",
-        compat="no_conflicts",
-        join="outer",
-        preprocess=SDFPreprocess(),
-        **kwargs,
-    )
+    else:
+        ds = xr.open_mfdataset(
+            path_glob,
+            data_vars="all",
+            coords="different",
+            compat="no_conflicts",
+            join="outer",
+            preprocess=SDFPreprocess(),
+            **kwargs,
+        )
+    if load_deck:
+        ds.attrs["deck"] = _load_deck(load_deck, path_glob[0])
+    return ds
 
 
 def open_mfdataset(
@@ -221,6 +225,7 @@ def open_mfdataset(
     probe_names: list[str] | None = None,
     data_vars: list[str] | None = None,
     chunks: T_Chunks = "auto",
+    load_deck: bool | PathLike = False,
 ) -> xr.Dataset:
     """Open a set of EPOCH SDF files as one `xarray.Dataset`
 
@@ -262,6 +267,10 @@ def open_mfdataset(
         <https://docs.xarray.dev/en/stable/user-guide/dask.html#chunking-and-performance>`_
         for details on why this is useful for large datasets. The default behaviour is
         to do this automatically and can be disabled by ``chunks=None``.
+    load_deck :
+        If ``True``, load the EPOCH input deck from ``input.deck`` in the same
+        directory as the SDF files, or from the specified path if a string or
+        PathLike is given.
     """
 
     path_glob = _resolve_glob(path_glob)
@@ -273,6 +282,7 @@ def open_mfdataset(
             keep_particles=keep_particles,
             probe_names=probe_names,
             chunks=chunks,
+            load_deck=load_deck,
         )
 
     _, var_times_map = make_time_dims(path_glob)
@@ -280,7 +290,11 @@ def open_mfdataset(
     all_dfs = []
     for f in path_glob:
         ds = xr.open_dataset(
-            f, keep_particles=keep_particles, probe_names=probe_names, chunks=chunks
+            f,
+            keep_particles=keep_particles,
+            probe_names=probe_names,
+            chunks=chunks,
+            load_deck=load_deck,
         )
 
         # If the data_vars are specified then only load them in and disregard the rest.
@@ -320,6 +334,7 @@ def open_datatree(
     *,
     keep_particles: bool = False,
     probe_names: list[str] | None = None,
+    load_deck: bool | PathLike = False,
 ) -> xr.DataTree:
     """
     An `xarray.DataTree` is constructed utilising the original names in the SDF
@@ -356,6 +371,10 @@ def open_datatree(
         If ``True``, also load particle data (this may use a lot of memory!)
     probe_names
         List of EPOCH probe names
+    load_deck
+        If ``True``, load the EPOCH input deck from ``input.deck`` in the same
+        directory as the SDF file, or from the specified path if a string or
+        PathLike is given.
 
     Examples
     --------
@@ -364,7 +383,10 @@ def open_datatree(
     """
 
     return xr.open_datatree(
-        path, keep_particles=keep_particles, probe_names=probe_names
+        path,
+        keep_particles=keep_particles,
+        probe_names=probe_names,
+        load_deck=load_deck,
     )
 
 
@@ -375,6 +397,7 @@ def open_mfdatatree(
     keep_particles: bool = False,
     probe_names: list[str] | None = None,
     data_vars: list[str] | None = None,
+    load_deck: bool | PathLike = False,
 ) -> xr.DataTree:
     """Open a set of EPOCH SDF files as one `xarray.DataTree`
 
@@ -437,6 +460,10 @@ def open_mfdatatree(
         List of EPOCH probe names
     data_vars
         List of data vars to load in (If not specified loads in all variables)
+    load_deck
+        If ``True``, load the EPOCH input deck from ``input.deck`` in the same
+        directory as the SDF files, or from the specified path if a string or
+        PathLike is given.
 
     Examples
     --------
@@ -451,6 +478,7 @@ def open_mfdatatree(
         keep_particles=keep_particles,
         probe_names=probe_names,
         data_vars=data_vars,
+        load_deck=load_deck,
     )
 
     return _build_datatree_from_dataset(combined_ds)
@@ -542,17 +570,17 @@ class SDFDataStore(AbstractDataStore):
         manager,
         drop_variables=None,
         keep_particles=False,
+        load_deck=False,
         lock=None,
         probe_names=None,
-        load_deck: bool | PathLike = False,
     ):
         self._manager = manager
         self._filename = self.ds.header["filename"]
         self.drop_variables = drop_variables
         self.keep_particles = keep_particles
+        self.load_deck = load_deck
         self.lock = ensure_lock(lock)
         self.probe_names = probe_names
-        self.load_deck = load_deck
 
     @classmethod
     def open(
@@ -797,6 +825,7 @@ class SDFEntrypoint(BackendEntrypoint):
         "drop_variables",
         "keep_particles",
         "probe_names",
+        "load_deck",
     ]
 
     def open_dataset(
@@ -838,12 +867,14 @@ class SDFEntrypoint(BackendEntrypoint):
         drop_variables=None,
         keep_particles=False,
         probe_names=None,
+        load_deck=False,
     ):
         ds = self.open_dataset(
             filename_or_obj,
             drop_variables=drop_variables,
             keep_particles=keep_particles,
             probe_names=probe_names,
+            load_deck=load_deck,
         )
         return _build_datatree_from_dataset(ds)
 
