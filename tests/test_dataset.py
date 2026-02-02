@@ -688,3 +688,78 @@ def test_open_mfdataset_data_vars_separate_times_multiple_times_keep_particles()
 
         assert particle_px_coords["time2"] == 1
         assert particle_px_coords["ID_electron_beam"] == 1440
+
+
+def test_open_dataset_load_deck_false():
+    with xr.open_dataset(TEST_FILES_DIR / "0000.sdf", load_deck=False) as df:
+        assert "deck" not in df.attrs
+
+
+def test_open_dataset_load_deck_true():
+    with xr.open_dataset(TEST_FILES_DIR / "0000.sdf", load_deck=True) as df:
+        assert "deck" in df.attrs
+        assert "constant" in df.attrs["deck"]
+
+
+def test_open_dataset_load_deck_relative():
+    with xr.open_dataset(TEST_FILES_DIR / "0000.sdf", load_deck="input.deck") as df:
+        assert "deck" in df.attrs
+        assert "constant" in df.attrs["deck"]
+
+
+def test_open_dataset_load_deck_absolute():
+    with xr.open_dataset(
+        TEST_FILES_DIR / "0000.sdf", load_deck=TEST_FILES_DIR / "input.deck"
+    ) as df:
+        assert "deck" in df.attrs
+        assert "constant" in df.attrs["deck"]
+
+
+def test_open_dataset_load_deck_absolute_other_path():
+    with xr.open_dataset(
+        TEST_FILES_DIR / "0000.sdf", load_deck=TEST_3D_DIST_FN / "input.deck"
+    ) as df:
+        assert "deck" in df.attrs
+        assert "constant" not in df.attrs["deck"]
+
+
+def test_open_mfdataset_load_deck_false():
+    with open_mfdataset(
+        TEST_FILES_DIR.glob("*.sdf"),
+        load_deck=False,
+    ) as df:
+        assert "deck" not in df.attrs
+
+
+def test_open_mfdataset_load_deck_true():
+    with open_mfdataset(
+        TEST_FILES_DIR.glob("*.sdf"),
+        load_deck=True,
+    ) as df:
+        assert "deck" in df.attrs
+        assert "constant" in df.attrs["deck"]
+
+
+def test_open_mfdataset_load_deck_relative():
+    with open_mfdataset(
+        TEST_FILES_DIR.glob("*.sdf"),
+        load_deck="input.deck",
+    ) as df:
+        assert "deck" in df.attrs
+        assert "constant" in df.attrs["deck"]
+
+
+def test_open_mfdataset_load_deck_absolute():
+    with open_mfdataset(
+        TEST_FILES_DIR.glob("*.sdf"), load_deck=TEST_FILES_DIR / "input.deck"
+    ) as df:
+        assert "deck" in df.attrs
+        assert "constant" in df.attrs["deck"]
+
+
+def test_open_mfdataset_load_deck_absolute_other_path():
+    with open_mfdataset(
+        TEST_FILES_DIR.glob("*.sdf"), load_deck=TEST_3D_DIST_FN / "input.deck"
+    ) as df:
+        assert "deck" in df.attrs
+        assert "constant" not in df.attrs["deck"]
