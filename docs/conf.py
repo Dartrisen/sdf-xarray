@@ -53,9 +53,6 @@ extensions = [
     "sphinx_togglebutton",
 ]
 
-togglebutton_hint = "Click to show input.deck"
-togglebutton_hint_hide = "Click to hide input.deck"
-
 autosummary_generate = True
 
 # Add any paths that contain templates here, relative to this directory.
