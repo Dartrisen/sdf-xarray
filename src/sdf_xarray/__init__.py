@@ -212,8 +212,10 @@ def combine_datasets(
             preprocess=SDFPreprocess(),
             **kwargs,
         )
+
     if load_deck:
         ds.attrs["deck"] = _load_deck(load_deck, path_glob[0])
+
     return ds
 
 
