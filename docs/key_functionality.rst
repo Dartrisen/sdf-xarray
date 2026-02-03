@@ -168,20 +168,22 @@ used to generate the simulation. This file contains important simulation
 parameters that may not be present in the SDF outputs. By loading this file,
 you can access these parameters as part of your dataset's metadata.
 To do this, use the ``input_deck`` parameter when calling
-`sdf_xarray.open_dataset`.
+`xarray.open_dataset`, `sdf_xarray.open_datatree`, `sdf_xarray.open_mfdataset`
+and `sdf_xarray.open_mfdatatree`.
 
-.. note::
-   You may need to install the `epydeck` extra dependencies
-   to enable this functionality. You can do this via pip:
+You may need to install the ``epydeck`` extra dependencies
+to enable this functionality. You can do this via pip:
 
-   .. code-block:: bash
+.. code-block:: bash
 
-        pip install "epydeck"
+   pip install "epydeck"
 
-By default the ``input_deck`` parameter is set to ``False``. You can set it to
-``True`` to automatically search for an `input.deck` file in the same directory
-as the SDF file being loaded, or you can provide a specific path to the
-`input.deck` file as a path variable or string.
+By default the ``input_deck`` parameter is set to ``False``. You can set it to  
+``True`` to automatically search for a file with the name ``"input.deck"`` in the  
+same directory as the SDF file being loaded. If you wish to load a file that has  
+a different name and the path is relative then it will search in the same directory  
+as the SDF file (e.g. ``"template.deck"``), if it is absolute then it will use the  
+full path to the find the file (e.g. ``"/path/to/decks/input.deck"``).
 
 .. toggle::
 
