@@ -268,9 +268,8 @@ def open_mfdataset(
         for details on why this is useful for large datasets. The default behaviour is
         to do this automatically and can be disabled by ``chunks=None``.
     load_deck :
-        If ``True``, load the EPOCH input deck from ``input.deck`` in the same
-        directory as the SDF files, or from the specified path if a string or
-        PathLike is given.
+        If ``True``, load the ``"input.deck"`` from the same directory as the SDF files,
+        or from a relative or absolute file path. See :ref:`loading-input-deck` for details.
     """
 
     path_glob = _resolve_glob(path_glob)
@@ -372,10 +371,8 @@ def open_datatree(
     probe_names
         List of EPOCH probe names
     load_deck
-        If ``True``, load the EPOCH input deck from ``input.deck`` in the same
-        directory as the SDF file, or from the specified path if a string or
-        PathLike is given.
-
+        If ``True``, load the ``"input.deck"`` from the same directory as the SDF file,
+        or from a relative or absolute file path. See :ref:`loading-input-deck` for details.
     Examples
     --------
     >>> dt = open_datatree("0000.sdf")
@@ -461,9 +458,8 @@ def open_mfdatatree(
     data_vars
         List of data vars to load in (If not specified loads in all variables)
     load_deck
-        If ``True``, load the EPOCH input deck from ``input.deck`` in the same
-        directory as the SDF files, or from the specified path if a string or
-        PathLike is given.
+        If ``True``, load the ``"input.deck"`` from the same directory as the SDF files,
+        or from a relative or absolute file path. See :ref:`loading-input-deck` for details.
 
     Examples
     --------

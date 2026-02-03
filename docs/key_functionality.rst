@@ -161,6 +161,8 @@ consumption.
 
    sdfxr.open_mfdataset("tutorial_dataset_1d/*.sdf", data_vars=["Electric_Field_Ex"])
 
+.. _loading-input-deck:
+
 Loading the input.deck
 ~~~~~~~~~~~~~~~~~~~~~~
 
