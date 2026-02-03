@@ -161,29 +161,35 @@ consumption.
 
    sdfxr.open_mfdataset("tutorial_dataset_1d/*.sdf", data_vars=["Electric_Field_Ex"])
 
-Optional loading of deck file
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-When loading SDF files, you can optionally include the `input.deck` file
-used to generate the simulation. This file contains important simulation
-parameters that may not be present in the SDF outputs. By loading this file,
-you can access these parameters as part of your dataset's metadata.
-To do this, use the ``input_deck`` parameter when calling
-`xarray.open_dataset`, `sdf_xarray.open_datatree`, `sdf_xarray.open_mfdataset`
-and `sdf_xarray.open_mfdatatree`.
+Loading the input.deck
+~~~~~~~~~~~~~~~~~~~~~~
 
-You may need to install the ``epydeck`` extra dependencies
-to enable this functionality. You can do this via pip:
+When loading SDF files, you can optionally include the ``input.deck`` file
+used to initialise the simulation. This file contains the initial simulation setup
+information which is not present in SDF outputs. By loading this file,
+you can access these parameters as part of your dataset's metadata.
+To do this, use the ``input_deck`` parameter when loading an SDF file with
+`xarray.open_dataset`, `sdf_xarray.open_datatree`, `sdf_xarray.open_mfdataset`
+or `sdf_xarray.open_mfdatatree`.
+
+If you do not already have the ``epydeck`` package installed you will need to run
+the following pip command:
 
 .. code-block:: bash
 
-   pip install "epydeck"
+   pip install epydeck
 
-By default the ``input_deck`` parameter is set to ``False``. You can set it to  
-``True`` to automatically search for a file with the name ``"input.deck"`` in the  
-same directory as the SDF file being loaded. If you wish to load a file that has  
-a different name and the path is relative then it will search in the same directory  
-as the SDF file (e.g. ``"template.deck"``), if it is absolute then it will use the  
-full path to the find the file (e.g. ``"/path/to/decks/input.deck"``).
+There are a few ways you can load an input deck:
+
+- **Default behaviour**: The input deck is not loaded
+- ``True``: Search for a file named ``"input.deck"`` in the same directory as
+  the SDF file.
+- **Relative path**: (e.g. ``"template.deck"``) Searches for that specific filename
+  within the same directory as the SDF file.
+- **Absolute path**: (e.g. ``"/path/to/input.deck"``) Uses the full, specified path
+  to locate the file.
+
+An example of loading a deck can be seen below
 
 .. toggle::
 
@@ -193,7 +199,11 @@ full path to the find the file (e.g. ``"/path/to/decks/input.deck"``).
       from IPython.display import Code
 
       ds = xr.open_dataset("tutorial_dataset_1d/0010.sdf", load_deck=True)
-      json_str = json.dumps(ds.attrs["deck"], indent=4)
+      # The results are accessible by calling 
+      deck = ds.attrs["deck"]
+
+      # Some prettification to make it looks nice in jupyter notebooks
+      json_str = json.dumps(deck, indent=4)
       Code(json_str, language='json')
 
 Data interaction examples
