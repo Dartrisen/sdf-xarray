@@ -166,26 +166,20 @@ consumption.
 Loading the input.deck
 ~~~~~~~~~~~~~~~~~~~~~~
 
-When loading SDF files, you can optionally include the ``input.deck`` file
-used to initialise the simulation. This file contains the initial simulation setup
-information which is not present in SDF outputs. By loading this file,
-you can access these parameters as part of your dataset's metadata.
-To do this, use the ``input_deck`` parameter when loading an SDF file with
+When loading SDF files, `sdf_xarray` will attempt to automatically load
+the ``input.deck`` file used to initialise the simulation from the same
+directory as the SDF file. If the file is not found, it will silently fail
+and continue loading the SDF file as normal. This file contains the initial
+simulation setup information which is not present in SDF outputs. By loading
+this file, you can access these parameters as part of your dataset's metadata.
+To do this, use the ``deck_path`` parameter when loading an SDF file with
 `xarray.open_dataset`, `sdf_xarray.open_datatree`, `sdf_xarray.open_mfdataset`
 or `sdf_xarray.open_mfdatatree`.
 
-If you do not already have the ``epydeck`` package installed you will need to run
-the following pip command:
-
-.. code-block:: bash
-
-   pip install epydeck
-
 There are a few ways you can load an input deck:
 
-- **Default behaviour**: The input deck is not loaded
-- ``True``: Search for a file named ``"input.deck"`` in the same directory as
-  the SDF file.
+- **Default behaviour**: The input deck is loaded from the same directory
+  as the SDF file if it exists. If it does not exist, it will silently fail.
 - **Relative path**: (e.g. ``"template.deck"``) Searches for that specific filename
   within the same directory as the SDF file.
 - **Absolute path**: (e.g. ``"/path/to/input.deck"``) Uses the full, specified path
@@ -200,7 +194,7 @@ An example of loading a deck can be seen below
       import json
       from IPython.display import Code
 
-      ds = xr.open_dataset("tutorial_dataset_1d/0010.sdf", load_deck=True)
+      ds = xr.open_dataset("tutorial_dataset_1d/0010.sdf")
       # The results are accessible by calling 
       deck = ds.attrs["deck"]
 
