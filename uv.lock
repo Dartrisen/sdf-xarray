@@ -2257,6 +2257,7 @@ name = "sdf-xarray"
 source = { editable = "." }
 dependencies = [
     { name = "dask" },
+    { name = "epydeck" },
     { name = "numpy" },
     { name = "xarray" },
 ]
@@ -2331,6 +2332,7 @@ test = [
 requires-dist = [
     { name = "dask", specifier = ">=2024.7.1" },
     { name = "dask", extras = ["diagnostics"], marker = "extra == 'jupyter'" },
+    { name = "epydeck", specifier = ">=1.0.1" },
     { name = "ipykernel", marker = "extra == 'jupyter'", specifier = ">=6.29.5" },
     { name = "numpy", specifier = ">=2.0.0" },
     { name = "pint", marker = "extra == 'pint'" },
