@@ -62,7 +62,6 @@ docs = [
   "sphinx-copybutton",
   "pooch>=1.8.2",
   "tqdm",
-  "epydeck",
 ]
 build = ["cibuildwheel[uv]"]
 lint = ["ruff"]
@@ -72,7 +71,6 @@ test = [
   "matplotlib",
   "pooch>=1.8.2",
   "tqdm",
-  "epydeck",
 ]
 
 [project.entry-points."xarray.backends"]
