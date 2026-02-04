@@ -2279,7 +2279,6 @@ build = [
 dev = [
     { name = "cibuildwheel", extra = ["uv"] },
     { name = "dask", extra = ["complete"] },
-    { name = "epydeck" },
     { name = "jupyter-sphinx" },
     { name = "matplotlib" },
     { name = "myst-parser" },
@@ -2299,7 +2298,6 @@ dev = [
     { name = "tqdm" },
 ]
 docs = [
-    { name = "epydeck" },
     { name = "jupyter-sphinx" },
     { name = "matplotlib" },
     { name = "myst-parser" },
@@ -2321,7 +2319,6 @@ lint = [
 ]
 test = [
     { name = "dask", extra = ["complete"] },
-    { name = "epydeck" },
     { name = "matplotlib" },
     { name = "pooch" },
     { name = "pytest" },
@@ -2346,7 +2343,6 @@ build = [{ name = "cibuildwheel", extras = ["uv"] }]
 dev = [
     { name = "cibuildwheel", extras = ["uv"] },
     { name = "dask", extras = ["complete"] },
-    { name = "epydeck" },
     { name = "jupyter-sphinx" },
     { name = "matplotlib" },
     { name = "myst-parser" },
@@ -2366,7 +2362,6 @@ dev = [
     { name = "tqdm" },
 ]
 docs = [
-    { name = "epydeck" },
     { name = "jupyter-sphinx" },
     { name = "matplotlib" },
     { name = "myst-parser" },
@@ -2386,7 +2381,6 @@ docs = [
 lint = [{ name = "ruff" }]
 test = [
     { name = "dask", extras = ["complete"] },
-    { name = "epydeck" },
     { name = "matplotlib" },
     { name = "pooch", specifier = ">=1.8.2" },
     { name = "pytest", specifier = ">=3.3.0" },
