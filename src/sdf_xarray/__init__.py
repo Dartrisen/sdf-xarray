@@ -47,7 +47,7 @@ def _rename_with_underscore(name: str) -> str:
     return name.replace("/", "_").replace(" ", "_").replace("-", "_")
 
 
-def load_deck(
+def _load_and_attach_deck(
     filename: PathLike | None,
     ds: xr.Dataset | xr.DataTree,
 ) -> xr.Dataset | xr.DataTree:
@@ -226,7 +226,7 @@ def combine_datasets(
             **kwargs,
         )
 
-    ds = load_deck(deck_path, ds)
+    ds = _load_and_attach_deck(deck_path, ds)
 
     return ds  # noqa: RET504
 
@@ -820,7 +820,7 @@ class SDFDataStore(AbstractDataStore):
         # )
 
         ds = xr.Dataset(data_vars, attrs=attrs, coords=coords)
-        ds = load_deck(self.deck_path, ds)
+        ds = _load_and_attach_deck(self.deck_path, ds)
         ds.set_close(self.ds.close)
 
         return ds
