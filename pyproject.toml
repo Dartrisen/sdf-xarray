@@ -20,7 +20,12 @@ authors = [
   { name = "Liam Pattinson", email = "liam.pattinson@york.ac.uk" },
 ]
 requires-python = ">=3.11,<3.15"
-dependencies = ["numpy>=2.0.0", "xarray>=2024.1.0", "dask>=2024.7.1", "epydeck>=1.0.1"]
+dependencies = [
+  "numpy>=2.0.0",
+  "xarray>=2024.1.0",
+  "dask>=2024.7.1",
+  "epydeck~=1.0"
+]
 description = "Provides a backend for xarray to read SDF files as created by the EPOCH plasma PIC code."
 classifiers = [
   "Development Status :: 5 - Production/Stable",
