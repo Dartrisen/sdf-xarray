@@ -61,11 +61,11 @@ def load_deck(
     """
 
     root_dir = Path(ds.attrs["filename"]).parent
-    target = Path(filename) if filename else Path("input.deck")
+    target = Path("input.deck") if filename is None else Path(filename)
     deck_path = target if target.is_absolute() else root_dir / target
 
     if not deck_path.exists():
-        if filename:
+        if filename is not None:
             raise FileNotFoundError(f"Deck file not found: {deck_path}")
         return ds
 
