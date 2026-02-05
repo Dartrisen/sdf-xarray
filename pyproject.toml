@@ -18,6 +18,7 @@ authors = [
   { name = "Shaun Doherty", email = "shaun.doherty@york.ac.uk" },
   { name = "Chris Herdman", email = "chris.herdman@york.ac.uk" },
   { name = "Liam Pattinson", email = "liam.pattinson@york.ac.uk" },
+  { name = "Sviatoslav Shekhanov", email = "sviatoslav.shekhanov@york.ac.uk" },
 ]
 requires-python = ">=3.11,<3.15"
 dependencies = [
