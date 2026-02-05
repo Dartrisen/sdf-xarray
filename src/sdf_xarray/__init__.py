@@ -195,7 +195,7 @@ def purge_unselected_data_vars(ds: xr.Dataset, data_vars: list[str]) -> xr.Datas
 
 def combine_datasets(
     path_glob: Iterable | str,
-    data_vars: list[str],
+    data_vars: list[str] | None = None,
     deck_path: PathLike | None = None,
     **kwargs,
 ) -> xr.Dataset:
