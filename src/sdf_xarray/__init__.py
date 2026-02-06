@@ -9,6 +9,7 @@ from os import PathLike as os_PathLike
 from pathlib import Path
 from typing import ClassVar
 
+import epydeck
 import numpy as np
 import xarray as xr
 from packaging.version import Version
@@ -44,6 +45,32 @@ def _rename_with_underscore(name: str) -> str:
     """A lot of the variable names have spaces, forward slashes and dashes in them, which
     are not valid in netCDF names so we replace them with underscores."""
     return name.replace("/", "_").replace(" ", "_").replace("-", "_")
+
+
+def _load_deck(
+    root_dir: PathLike,
+    filename: PathLike | None,
+) -> dict:
+    """Load and attach an EPOCH input deck to the dataset.
+
+    A provided filename is resolved relative to the SDF file directory and must
+    exist, otherwise a FileNotFoundError is raised. If no filename is given, a
+    default ``input.deck`` is searched for and silently ignored if missing.
+
+    When found, the parsed deck is stored in ``ds.attrs["deck"]``.
+    """
+
+    root_dir = Path(root_dir).parent
+    target = Path("input.deck") if filename is None else Path(filename)
+    deck_path = target if target.is_absolute() else root_dir / target
+
+    if not deck_path.exists():
+        if filename is not None:
+            raise FileNotFoundError(f"Deck file not found: {deck_path}")
+        return {}
+
+    with deck_path.open() as f:
+        return epydeck.load(f)
 
 
 def _process_latex_name(variable_name: str) -> str:
@@ -165,7 +192,10 @@ def purge_unselected_data_vars(ds: xr.Dataset, data_vars: list[str]) -> xr.Datas
 
 
 def combine_datasets(
-    path_glob: Iterable | str, data_vars: list[str], **kwargs
+    path_glob: Iterable | str,
+    data_vars: list[str] | None = None,
+    deck_path: PathLike | None = None,
+    **kwargs,
 ) -> xr.Dataset:
     """
     Combine all datasets using a single time dimension, optionally extract
@@ -173,7 +203,7 @@ def combine_datasets(
     """
 
     if data_vars is not None:
-        return xr.open_mfdataset(
+        ds = xr.open_mfdataset(
             path_glob,
             join="outer",
             coords="different",
@@ -183,16 +213,20 @@ def combine_datasets(
             preprocess=SDFPreprocess(data_vars=data_vars),
             **kwargs,
         )
+    else:
+        ds = xr.open_mfdataset(
+            path_glob,
+            data_vars="all",
+            coords="different",
+            compat="no_conflicts",
+            join="outer",
+            preprocess=SDFPreprocess(),
+            **kwargs,
+        )
 
-    return xr.open_mfdataset(
-        path_glob,
-        data_vars="all",
-        coords="different",
-        compat="no_conflicts",
-        join="outer",
-        preprocess=SDFPreprocess(),
-        **kwargs,
-    )
+    ds.attrs["deck"] = _load_deck(ds.attrs["filename"], deck_path)
+
+    return ds
 
 
 def open_mfdataset(
@@ -203,6 +237,7 @@ def open_mfdataset(
     probe_names: list[str] | None = None,
     data_vars: list[str] | None = None,
     chunks: T_Chunks = "auto",
+    deck_path: PathLike | None = None,
 ) -> xr.Dataset:
     """Open a set of EPOCH SDF files as one `xarray.Dataset`
 
@@ -244,6 +279,10 @@ def open_mfdataset(
         <https://docs.xarray.dev/en/stable/user-guide/dask.html#chunking-and-performance>`_
         for details on why this is useful for large datasets. The default behaviour is
         to do this automatically and can be disabled by ``chunks=None``.
+    deck_path :
+        If ``None``, attempt to load the ``"input.deck"`` from the same directory as the SDF files
+        and silently fail if it does not exist. If a path is given, load the specified deck
+        from a relative or absolute file path. See :ref:`loading-input-deck` for details.
     """
 
     path_glob = _resolve_glob(path_glob)
@@ -255,6 +294,7 @@ def open_mfdataset(
             keep_particles=keep_particles,
             probe_names=probe_names,
             chunks=chunks,
+            deck_path=deck_path,
         )
 
     _, var_times_map = make_time_dims(path_glob)
@@ -262,7 +302,11 @@ def open_mfdataset(
     all_dfs = []
     for f in path_glob:
         ds = xr.open_dataset(
-            f, keep_particles=keep_particles, probe_names=probe_names, chunks=chunks
+            f,
+            keep_particles=keep_particles,
+            probe_names=probe_names,
+            chunks=chunks,
+            deck_path=deck_path,
         )
 
         # If the data_vars are specified then only load them in and disregard the rest.
@@ -302,6 +346,7 @@ def open_datatree(
     *,
     keep_particles: bool = False,
     probe_names: list[str] | None = None,
+    deck_path: PathLike | None = None,
 ) -> xr.DataTree:
     """
     An `xarray.DataTree` is constructed utilising the original names in the SDF
@@ -338,7 +383,10 @@ def open_datatree(
         If ``True``, also load particle data (this may use a lot of memory!)
     probe_names
         List of EPOCH probe names
-
+    deck_path
+        If ``None``, attempt to load the ``"input.deck"`` from the same directory as the SDF files
+        and silently fail if it does not exist. If a path is given, load the specified deck
+        from a relative or absolute file path. See :ref:`loading-input-deck` for details.
     Examples
     --------
     >>> dt = open_datatree("0000.sdf")
@@ -346,7 +394,10 @@ def open_datatree(
     """
 
     return xr.open_datatree(
-        path, keep_particles=keep_particles, probe_names=probe_names
+        path,
+        keep_particles=keep_particles,
+        probe_names=probe_names,
+        deck_path=deck_path,
     )
 
 
@@ -357,6 +408,7 @@ def open_mfdatatree(
     keep_particles: bool = False,
     probe_names: list[str] | None = None,
     data_vars: list[str] | None = None,
+    deck_path: PathLike | None = None,
 ) -> xr.DataTree:
     """Open a set of EPOCH SDF files as one `xarray.DataTree`
 
@@ -419,6 +471,10 @@ def open_mfdatatree(
         List of EPOCH probe names
     data_vars
         List of data vars to load in (If not specified loads in all variables)
+    deck_path
+        If ``None``, attempt to load the ``"input.deck"`` from the same directory as the SDF files
+        and silently fail if it does not exist. If a path is given, load the specified deck
+        from a relative or absolute file path. See :ref:`loading-input-deck` for details.
 
     Examples
     --------
@@ -433,6 +489,7 @@ def open_mfdatatree(
         keep_particles=keep_particles,
         probe_names=probe_names,
         data_vars=data_vars,
+        deck_path=deck_path,
     )
 
     return _build_datatree_from_dataset(combined_ds)
@@ -512,6 +569,7 @@ class SDFDataStore(AbstractDataStore):
     __slots__ = (
         "_filename",
         "_manager",
+        "deck_path",
         "drop_variables",
         "keep_particles",
         "lock",
@@ -523,13 +581,15 @@ class SDFDataStore(AbstractDataStore):
         manager,
         drop_variables=None,
         keep_particles=False,
+        deck_path=None,
         lock=None,
         probe_names=None,
     ):
         self._manager = manager
-        self._filename = self.ds.filename
+        self._filename = self.ds.header["filename"]
         self.drop_variables = drop_variables
         self.keep_particles = keep_particles
+        self.deck_path = deck_path
         self.lock = ensure_lock(lock)
         self.probe_names = probe_names
 
@@ -541,6 +601,7 @@ class SDFDataStore(AbstractDataStore):
         drop_variables=None,
         keep_particles=False,
         probe_names=None,
+        deck_path=None,
     ):
         if isinstance(filename, os.PathLike):
             filename = os.fspath(filename)
@@ -552,6 +613,7 @@ class SDFDataStore(AbstractDataStore):
             drop_variables=drop_variables,
             keep_particles=keep_particles,
             probe_names=probe_names,
+            deck_path=deck_path,
         )
 
     def _acquire(self, needs_lock=True):
@@ -594,7 +656,7 @@ class SDFDataStore(AbstractDataStore):
             return grid_name.split("/", maxsplit=1)[-1]
 
         def _grid_species_name(grid_name: str) -> str:
-            return grid_name.split("/")[-1]
+            return grid_name.rsplit("/", maxsplit=1)[-1]
 
         def _process_grid_name(grid_name: str, transform_func) -> str:
             """Apply the given transformation function and then rename with underscores."""
@@ -756,6 +818,7 @@ class SDFDataStore(AbstractDataStore):
         # )
 
         ds = xr.Dataset(data_vars, attrs=attrs, coords=coords)
+        ds.attrs["deck"] = _load_deck(ds.attrs["filename"], self.deck_path)
         ds.set_close(self.ds.close)
 
         return ds
@@ -771,6 +834,7 @@ class SDFEntrypoint(BackendEntrypoint):
         "drop_variables",
         "keep_particles",
         "probe_names",
+        "deck_path",
     ]
 
     def open_dataset(
@@ -780,6 +844,7 @@ class SDFEntrypoint(BackendEntrypoint):
         drop_variables=None,
         keep_particles=False,
         probe_names=None,
+        deck_path=None,
     ):
         if isinstance(filename_or_obj, Path):
             # sdf library takes a filename only
@@ -791,6 +856,7 @@ class SDFEntrypoint(BackendEntrypoint):
             drop_variables=drop_variables,
             keep_particles=keep_particles,
             probe_names=probe_names,
+            deck_path=deck_path,
         )
         with close_on_error(store):
             return store.load()
@@ -800,6 +866,7 @@ class SDFEntrypoint(BackendEntrypoint):
         "drop_variables",
         "keep_particles",
         "probe_names",
+        "deck_path",
     ]
 
     def open_datatree(
@@ -809,12 +876,14 @@ class SDFEntrypoint(BackendEntrypoint):
         drop_variables=None,
         keep_particles=False,
         probe_names=None,
+        deck_path=None,
     ):
         ds = self.open_dataset(
             filename_or_obj,
             drop_variables=drop_variables,
             keep_particles=keep_particles,
             probe_names=probe_names,
+            deck_path=deck_path,
         )
         return _build_datatree_from_dataset(ds)
 
