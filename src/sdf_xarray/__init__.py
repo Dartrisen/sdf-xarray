@@ -47,10 +47,10 @@ def _rename_with_underscore(name: str) -> str:
     return name.replace("/", "_").replace(" ", "_").replace("-", "_")
 
 
-def _load_and_attach_deck(
+def _load_deck(
+    root_dir: PathLike,
     filename: PathLike | None,
-    ds: xr.Dataset | xr.DataTree,
-) -> xr.Dataset | xr.DataTree:
+) -> dict:
     """Load and attach an EPOCH input deck to the dataset.
 
     A provided filename is resolved relative to the SDF file directory and must
@@ -60,19 +60,17 @@ def _load_and_attach_deck(
     When found, the parsed deck is stored in ``ds.attrs["deck"]``.
     """
 
-    root_dir = Path(ds.attrs["filename"]).parent
+    root_dir = Path(root_dir).parent
     target = Path("input.deck") if filename is None else Path(filename)
     deck_path = target if target.is_absolute() else root_dir / target
 
     if not deck_path.exists():
         if filename is not None:
             raise FileNotFoundError(f"Deck file not found: {deck_path}")
-        return ds
+        return {}
 
     with deck_path.open() as f:
-        ds.attrs["deck"] = epydeck.load(f)
-
-    return ds
+        return epydeck.load(f)
 
 
 def _process_latex_name(variable_name: str) -> str:
@@ -226,9 +224,9 @@ def combine_datasets(
             **kwargs,
         )
 
-    ds = _load_and_attach_deck(deck_path, ds)
+    ds.attrs["deck"] = _load_deck(ds.attrs["filename"], deck_path)
 
-    return ds  # noqa: RET504
+    return ds
 
 
 def open_mfdataset(
@@ -820,7 +818,7 @@ class SDFDataStore(AbstractDataStore):
         # )
 
         ds = xr.Dataset(data_vars, attrs=attrs, coords=coords)
-        ds = _load_and_attach_deck(self.deck_path, ds)
+        ds.attrs["deck"] = _load_deck(ds.attrs["filename"], self.deck_path)
         ds.set_close(self.ds.close)
 
         return ds
